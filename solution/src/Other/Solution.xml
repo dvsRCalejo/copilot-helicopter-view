@@ -1,35 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ImportExportXml version="9.1.0.643" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.26031.182" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.26031.182" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.26031.00182">
   <SolutionManifest>
-    <!-- Unique Name of Cds Solution-->
     <UniqueName>MyAgentsHelicopterView</UniqueName>
     <LocalizedNames>
-      <!-- Localized Solution Name in language code -->
       <LocalizedName description="My Agents Helicopter View" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
     <Version>1.0</Version>
-    <!-- Solution Package Type: Unmanaged(0)/Managed(1)/Both(2)-->
     <Managed>2</Managed>
     <Publisher>
-      <!-- Unique Publisher Name of Cds Solution -->
       <UniqueName>RicardoCalejo</UniqueName>
       <LocalizedNames>
-        <!-- Localized Cds Publisher Name in language code-->
         <LocalizedName description="Ricardo Calejo" languagecode="1033" />
       </LocalizedNames>
       <Descriptions>
-        <!-- Description of Cds Publisher in language code -->
         <Description description="Ricardo Calejo" languagecode="1033" />
       </Descriptions>
       <EMailAddress xsi:nil="true"></EMailAddress>
       <SupportingWebsiteUrl xsi:nil="true"></SupportingWebsiteUrl>
-      <!-- Customization Prefix for the Cds Publisher-->
       <CustomizationPrefix>rcalejo</CustomizationPrefix>
-      <!-- Derived Option Value Prefix for the Customization Prefix of Cds Publisher -->
       <CustomizationOptionValuePrefix>33410</CustomizationOptionValuePrefix>
       <Addresses>
-        <!-- Address of the Publisher-->
         <Address>
           <AddressNumber>1</AddressNumber>
           <AddressTypeCode>1</AddressTypeCode>
@@ -88,7 +79,22 @@
         </Address>
       </Addresses>
     </Publisher>
-    <RootComponents />
-    <MissingDependencies />
+    <RootComponents>
+      <RootComponent type="300" schemaName="rcalejo_copilothelicopterviewcodeapp_59d09" behavior="0" />
+    </RootComponents>
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="1" schemaName="bot" displayName="Agent" solution="PowerVirtualAgents (2026.2.4.19561674)">
+          <package appName="CCI Bots" version="2026.2.4.19561674">msdynce_CustomerCareIntelligenceBots_Anchor (2026.2.4.19561674)</package>
+        </Required>
+        <Dependent type="300" schemaName="rcalejo_copilothelicopterviewcodeapp_59d09" displayName="Copilot Helicopter View CodeApp" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="conversationtranscript" displayName="ConversationTranscript" solution="PowerVirtualAgentsCommon (2026.2.4.19561674)">
+          <package appName="CCI Bots" version="2026.2.4.19561674">msdynce_CustomerCareIntelligenceBots_Anchor (2026.2.4.19561674)</package>
+        </Required>
+        <Dependent type="300" schemaName="rcalejo_copilothelicopterviewcodeapp_59d09" displayName="Copilot Helicopter View CodeApp" />
+      </MissingDependency>
+    </MissingDependencies>
   </SolutionManifest>
 </ImportExportXml>
