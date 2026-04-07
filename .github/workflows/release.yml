@@ -75,7 +75,7 @@ jobs:
           VITE_DATAVERSE_URL=https://<your-org>.crm.dynamics.com
           EOF
           fi
-          cd _release && zip -r ../webapp-docker-${VERSION}.zip webapp/
+          cd _release && zip -r ../MyAgentsHelicopterView-docker-${VERSION}.zip webapp/
 
       # ── Create GitHub Release ─────────────────────────────────
       - name: Create GitHub Release
@@ -86,4 +86,4 @@ jobs:
           files: |
             solution/MyAgentsHelicopterView_${{ env.VERSION }}_managed.zip
             solution/MyAgentsHelicopterView_${{ env.VERSION }}_unmanaged.zip
-            webapp-docker-${{ env.VERSION }}.zip
+            MyAgentsHelicopterView-docker-${{ env.VERSION }}.zip
