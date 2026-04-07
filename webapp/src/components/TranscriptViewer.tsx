@@ -13,7 +13,7 @@ import {
   Label,
 } from '@fluentui/react-components';
 import type { ConversationTranscript, BotActivity } from '@/types';
-import { extractChannel, getChannelInfo } from '@/types';
+import { extractChannel, getChannelInfo, isUserRole } from '@/types';
 
 const useStyles = makeStyles({
   root: {
@@ -261,7 +261,7 @@ function TranscriptDrawer({ transcript, onClose }: TranscriptDrawerProps) {
             </MessageBar>
           ) : (
             activities.map((act, i) => {
-              const isUser = act.from?.role?.toLowerCase() === 'user';
+              const isUser = isUserRole(act);
               return (
                 <div
                   key={act.id ?? i}
@@ -433,7 +433,7 @@ export function TranscriptViewer({ transcripts, isLoading, error }: TranscriptVi
         <>
           {paged.map((t) => {
             const activities = parseActivities(t.content);
-            const preview = activities.find((a) => a.from?.role?.toLowerCase() === 'user')?.text;
+            const preview = activities.find((a) => isUserRole(a))?.text;
             const ch = getChannelInfo(extractChannel(t.content));
             return (
               <div

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import type { ConversationTranscript, BotActivity } from '@/types';
-import { extractChannel, getChannelInfo } from '@/types';
+import { extractChannel, getChannelInfo, isUserRole } from '@/types';
 
 function parseActivities(content: string | null): BotActivity[] {
   if (!content) return [];
@@ -58,7 +58,7 @@ function TranscriptDrawer({ transcript, onClose }: TranscriptDrawerProps) {
             </div>
           ) : (
             activities.map((act, i) => {
-              const isUser = act.from?.role?.toLowerCase() === 'user';
+              const isUser = isUserRole(act);
               return (
                 <div key={act.id ?? i} className={`chat-row ${isUser ? 'chat-row--user' : 'chat-row--bot'}`}>
                   <div className="chat-avatar">{isUser ? '👤' : '🤖'}</div>
@@ -229,7 +229,7 @@ export function TranscriptViewer({ transcripts, isLoading, error }: TranscriptVi
           <ul className="transcript-list">
             {paged.map((t) => {
               const activities = parseActivities(t.content);
-              const preview = activities.find((a) => a.from?.role?.toLowerCase() === 'user')?.text;
+              const preview = activities.find((a) => isUserRole(a))?.text;
               const ch = getChannelInfo(extractChannel(t.content));
               return (
                 <li

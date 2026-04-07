@@ -55,9 +55,21 @@ export interface BotActivity {
   from?: {
     id: string;
     name?: string;
-    role?: string;
+    role?: string | number;
   };
   text?: string;
+}
+
+/**
+ * Safely check whether an activity's from.role represents a user.
+ * Real Dataverse transcripts may store role as a number (0 = user)
+ * instead of the string "user".
+ */
+export function isUserRole(activity: BotActivity): boolean {
+  const r = activity.from?.role;
+  if (r == null) return false;
+  if (typeof r === 'number') return r === 0;
+  return String(r).toLowerCase() === 'user';
 }
 
 const CHANNEL_LABELS: Record<string, { label: string; icon: string }> = {

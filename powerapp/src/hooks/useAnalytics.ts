@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ConversationTranscript, AgentAnalytics, BotActivity, SessionMeta } from '@/types';
+import { isUserRole } from '@/types';
 
 function parseActivities(content: string | null): BotActivity[] {
   if (!content) return [];
@@ -29,8 +30,8 @@ interface SessionAnalysis {
 function analyzeSession(t: ConversationTranscript): SessionAnalysis {
   const activities = parseActivities(t.content);
   const messages = activities.filter((a) => a.type === 'message' && !!a.text);
-  const userMessages = messages.filter((a: BotActivity) => a.from?.role?.toLowerCase() === 'user');
-  const botMessages = messages.filter((a) => a.from?.role?.toLowerCase() !== 'user');
+  const userMessages = messages.filter((a: BotActivity) => isUserRole(a));
+  const botMessages = messages.filter((a) => !isUserRole(a));
 
   // Duration
   let durationSeconds = 0;
@@ -47,8 +48,8 @@ function analyzeSession(t: ConversationTranscript): SessionAnalysis {
     const msg = messages[i];
     const next = messages[i + 1];
     if (
-      msg.from?.role?.toLowerCase() === 'user' &&
-      next.from?.role?.toLowerCase() !== 'user' &&
+      isUserRole(msg) &&
+      !isUserRole(next) &&
       msg.timestamp &&
       next.timestamp
     ) {
@@ -67,7 +68,7 @@ function analyzeSession(t: ConversationTranscript): SessionAnalysis {
   } else {
     // Check if last user message got a bot reply
     const lastUserIdx = messages.findLastIndex(
-      (a: BotActivity) => a.from?.role?.toLowerCase() === 'user'
+      (a: BotActivity) => isUserRole(a)
     );
     const hasReplyAfterLastUser = lastUserIdx >= 0 && lastUserIdx < messages.length - 1;
     outcome = hasReplyAfterLastUser ? 'resolved' : 'abandoned';
