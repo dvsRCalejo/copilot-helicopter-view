@@ -1,7 +1,0 @@
-{
-  "DataSourceName": "Copilots",
-  "Type": "CdsDataSource",
-  "EntityName": "bots",
-  "TableDisplayName": "Copilots",
-  "DataSourceType": "Table"
-}

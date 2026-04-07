@@ -92,7 +92,6 @@ MyCopilotHelicopterView/
 │   ├── power.config.json          # generated after power-apps init
 │   └── src/
 │       └── App.tsx                # Code-first app shell and feature entry point
-├── powerapp-canvas-legacy/        # archived PAC/canvas app files
 └── webapp/
     ├── src/
     │   ├── auth/                  # MSAL config + AuthProvider (login gate)

@@ -4,8 +4,6 @@ This folder is the rebuilt Code Apps project for Helicopter View using the offic
 
 - https://learn.microsoft.com/en-us/power-apps/developer/code-apps/how-to/npm-quickstart
 
-The previous PAC/canvas implementation was archived to [../powerapp-canvas-legacy](../powerapp-canvas-legacy).
-
 ## Prerequisites
 
 1. Power Platform environment with Code Apps enabled.
