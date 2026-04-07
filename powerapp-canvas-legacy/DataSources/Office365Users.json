@@ -1,0 +1,6 @@
+{
+  "DataSourceName": "Office365Users",
+  "Type": "Connected",
+  "ConnectorId": "/providers/Microsoft.PowerApps/apis/shared_office365users",
+  "DataSourceType": "Connector"
+}

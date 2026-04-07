@@ -1,0 +1,310 @@
+HomeScreen:
+  Properties:
+    Fill: =gblColorBg
+
+  Children:
+
+    # ── Header bar ──────────────────────────────────────────────────────────────
+    - recHeader:
+        Control: Rectangle
+        Properties:
+          Fill: =gblColorPrimary
+          Height: =64
+          Width: =Parent.Width
+          X: =0
+          Y: =0
+
+    - lblAppTitle:
+        Control: Label
+        Properties:
+          Color: =RGBA(255, 255, 255, 1)
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Bold
+          Height: =64
+          Size: =18
+          Text: ="🚁  Copilot Helicopter View"
+          Width: =Parent.Width - 200
+          X: =24
+          Y: =0
+          VerticalAlign: =VerticalAlign.Middle
+
+    - lblAgentCount:
+        Control: Label
+        Properties:
+          Color: =RGBA(255, 255, 255, 1)
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Height: =64
+          Size: =14
+          Text: =CountRows(galAgents.AllItems) & " agent(s)"
+          Width: =160
+          X: =Parent.Width - 180
+          Y: =0
+          Align: =Align.Right
+          VerticalAlign: =VerticalAlign.Middle
+
+    # ── Filter pills ────────────────────────────────────────────────────────────
+    - recFilterBar:
+        Control: Rectangle
+        Properties:
+          Fill: =gblColorSurface
+          Height: =52
+          Width: =Parent.Width
+          X: =0
+          Y: =64
+          BorderColor: =gblColorBorder
+          BorderThickness: =1
+
+    - btnFilterAll:
+        Control: Button
+        Properties:
+          Text: ="All"
+          OnSelect: =Set(gblFilterMode, "All")
+          Height: =36
+          Width: =80
+          X: =16
+          Y: =72
+          Fill: =If(gblFilterMode="All", gblColorPrimary, RGBA(237, 235, 233, 1))
+          Color: =If(gblFilterMode="All", RGBA(255,255,255,1), gblColorText)
+          BorderRadius: =18
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =13
+
+    - btnFilterOwned:
+        Control: Button
+        Properties:
+          Text: ="Owned by me"
+          OnSelect: =Set(gblFilterMode, "Owned")
+          Height: =36
+          Width: =120
+          X: =104
+          Y: =72
+          Fill: =If(gblFilterMode="Owned", gblColorPrimary, RGBA(237, 235, 233, 1))
+          Color: =If(gblFilterMode="Owned", RGBA(255,255,255,1), gblColorText)
+          BorderRadius: =18
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =13
+
+    - btnFilterShared:
+        Control: Button
+        Properties:
+          Text: ="Shared with me"
+          OnSelect: =Set(gblFilterMode, "Shared")
+          Height: =36
+          Width: =130
+          X: =232
+          Y: =72
+          Fill: =If(gblFilterMode="Shared", gblColorPrimary, RGBA(237, 235, 233, 1))
+          Color: =If(gblFilterMode="Shared", RGBA(255,255,255,1), gblColorText)
+          BorderRadius: =18
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =13
+
+    - btnFilterActive:
+        Control: Button
+        Properties:
+          Text: ="Active only"
+          OnSelect: =Set(gblFilterMode, "Active")
+          Height: =36
+          Width: =110
+          X: =370
+          Y: =72
+          Fill: =If(gblFilterMode="Active", gblColorPrimary, RGBA(237, 235, 233, 1))
+          Color: =If(gblFilterMode="Active", RGBA(255,255,255,1), gblColorText)
+          BorderRadius: =18
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =13
+
+    - btnSortOrder:
+        Control: Button
+        Properties:
+          Text: =If(gblSortMode = "Newest", "Newest first", "Oldest first")
+          OnSelect: =Set(gblSortMode, If(gblSortMode = "Newest", "Oldest", "Newest"))
+          Height: =36
+          Width: =130
+          X: =490
+          Y: =72
+          Fill: =RGBA(237, 235, 233, 1)
+          Color: =gblColorText
+          BorderRadius: =18
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =12
+
+    - txtAgentSearch:
+        Control: TextInput
+        Properties:
+          Default: =""
+          HintText: ="Search agents"
+          Height: =36
+          Width: =220
+          X: =Parent.Width - 240
+          Y: =72
+          BorderColor: =gblColorBorder
+          BorderThickness: =1
+          Fill: =RGBA(255, 255, 255, 1)
+          Color: =gblColorText
+          Font: =Font.'Segoe UI'
+          Size: =12
+
+    # ── Agent gallery ────────────────────────────────────────────────────────────
+    - galAgents:
+        Control: Gallery
+        Variant: galleryVertical
+        Properties:
+          Items: |
+            =With(
+              {
+                baseItems: Switch(
+                  gblFilterMode,
+                  "Owned",  Filter(colAgents, IsOwner = true),
+                  "Shared", Filter(colAgents, IsOwner = false),
+                  "Active", Filter(colAgents, statecode = 0),
+                  colAgents
+                ),
+                searchTerm: Lower(Trim(txtAgentSearch.Text))
+              },
+              SortByColumns(
+                If(
+                  IsBlank(searchTerm),
+                  baseItems,
+                  Filter(
+                    baseItems,
+                    searchTerm in Lower(Name) || searchTerm in Lower(Coalesce(description, ""))
+                  )
+                ),
+                "modifiedon",
+                If(gblSortMode = "Oldest", SortOrder.Ascending, SortOrder.Descending)
+              )
+            )
+          Height: =Parent.Height - 120
+          Width: =Parent.Width - 32
+          X: =16
+          Y: =120
+          TemplateHeight: =110
+          TemplatePadding: =10
+          ShowScrollbar: =true
+
+        Children:
+          - recCard:
+              Control: Rectangle
+              Properties:
+                Fill: =gblColorSurface
+                Height: =100
+                Width: =Parent.TemplateWidth
+                X: =0
+                Y: =0
+                BorderColor: =gblColorBorder
+                BorderThickness: =1
+                RadiusTopLeft: =8
+                RadiusTopRight: =8
+                RadiusBottomLeft: =8
+                RadiusBottomRight: =8
+
+          - lblAgentName:
+              Control: Label
+              Properties:
+                Text: =ThisItem.Name
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Size: =15
+                Color: =gblColorText
+                Height: =28
+                Width: =Parent.TemplateWidth - 120
+                X: =16
+                Y: =12
+
+          - lblOwnerBadge:
+              Control: Label
+              Properties:
+                Text: =If(ThisItem.IsOwner, "Owner", "Co-owner")
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Size: =11
+                Color: =If(ThisItem.IsOwner, RGBA(0,120,212,1), RGBA(0,120,100,1))
+                Fill: =If(ThisItem.IsOwner, RGBA(0,120,212,0.12), RGBA(0,120,100,0.12))
+                Height: =24
+                Width: =88
+                X: =Parent.TemplateWidth - 100
+                Y: =12
+                Align: =Align.Center
+                BorderRadius: =12
+
+          - lblStatus:
+              Control: Label
+              Properties:
+                Text: =If(ThisItem.statecode = 0, "● Active", "○ Inactive")
+                Font: =Font.'Segoe UI'
+                Size: =12
+                Color: =If(ThisItem.statecode = 0, RGBA(16,124,16,1), RGBA(164,38,44,1))
+                Height: =20
+                Width: =120
+                X: =16
+                Y: =40
+
+          - lblTranscripts:
+              Control: Label
+              Properties:
+                Text: =ThisItem.TranscriptCount & " transcript(s)"
+                Font: =Font.'Segoe UI'
+                Size: =12
+                Color: =gblColorTextMuted
+                Height: =20
+                Width: =200
+                X: =140
+                Y: =40
+
+          - lblLastModified:
+              Control: Label
+              Properties:
+                Text: ="Last modified: " & Text(DateTimeValue(ThisItem.modifiedon), DateTimeFormat.ShortDate)
+                Font: =Font.'Segoe UI'
+                Size: =12
+                Color: =gblColorTextMuted
+                Height: =20
+                Width: =300
+                X: =16
+                Y: =68
+
+          - btnViewAgent:
+              Control: Button
+              Properties:
+                Text: ="View details →"
+                OnSelect: |
+                  =Set(gblSelectedAgent, ThisItem);
+                  Navigate(AgentDetailScreen, ScreenTransition.Fade)
+                Height: =32
+                Width: =120
+                X: =Parent.TemplateWidth - 136
+                Y: =60
+                Fill: =gblColorPrimary
+                Color: =RGBA(255,255,255,1)
+                BorderRadius: =6
+                BorderThickness: =0
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Size: =13
+
+    # ── Empty state ──────────────────────────────────────────────────────────────
+    - lblEmpty:
+        Control: Label
+        Properties:
+          Text: ="No agents found for the selected filter."
+          Font: =Font.'Segoe UI'
+          Size: =14
+          Color: =gblColorTextMuted
+          Align: =Align.Center
+          Height: =40
+          Width: =400
+          X: =(Parent.Width - 400) / 2
+          Y: =300
+          Visible: =CountRows(galAgents.AllItems) = 0

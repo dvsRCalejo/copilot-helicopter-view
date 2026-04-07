@@ -1,0 +1,96 @@
+[
+  {
+    "CdsFCBContext": "{\"FileType\":true,\"ImageExternalStorage\":true}",
+    "EntitySetName": "cr95c_hrknowledges",
+    "IsHidden": false,
+    "IsSampleData": false,
+    "IsWritable": true,
+    "LogicalName": "cr95c_hrknowledge",
+    "Name": "HRKnowledge",
+    "NativeCDSDataSourceInfoNameMapping": {
+      "cr95c_answer": "Answer",
+      "cr95c_category": "Category",
+      "cr95c_hrknowledge_AsyncOperations": "System Jobs",
+      "cr95c_hrknowledge_BulkDeleteFailures": "Bulk Delete Failures",
+      "cr95c_hrknowledge_DuplicateBaseRecord": "Duplicate Records (cr95c_hrknowledge_DuplicateBaseRecord)",
+      "cr95c_hrknowledge_DuplicateMatchingRecord": "Duplicate Records (cr95c_hrknowledge_DuplicateMatchingRecord)",
+      "cr95c_hrknowledge_MailboxTrackingFolders": "Mailbox Auto Tracking Folders",
+      "cr95c_hrknowledge_PrincipalObjectAttributeAccesses": "Field Sharing",
+      "cr95c_hrknowledge_ProcessSession": "Process Sessions",
+      "cr95c_hrknowledge_SyncErrors": "Sync Errors",
+      "cr95c_hrknowledgeid": "HRKnowledge",
+      "cr95c_name": "Question Name",
+      "cr95c_question": "Question",
+      "createdby": "Created By",
+      "createdon": "Created On",
+      "createdonbehalfby": "Created By (Delegate)",
+      "importsequencenumber": "Import Sequence Number",
+      "modifiedby": "Modified By",
+      "modifiedon": "Modified On",
+      "modifiedonbehalfby": "Modified By (Delegate)",
+      "organizationid": "Organization Id",
+      "overriddencreatedon": "Record Created On",
+      "statecode": "Status",
+      "statuscode": "Status Reason",
+      "timezoneruleversionnumber": "Time Zone Rule Version Number",
+      "utcconversiontimezonecode": "UTC Conversion Time Zone Code",
+      "versionnumber": "Version Number"
+    },
+    "PreferredName": "HRKnowledge",
+    "Type": "NativeCDSDataSourceInfo"
+  },
+  {
+    "DisplayName": "HRKnowledge (Views)",
+    "Name": "_cr95c_hrknowledge_views",
+    "RelatedEntityName": "HRKnowledge",
+    "TrimmedViewName": true,
+    "Type": "ViewInfo",
+    "ViewInfoNameMapping": {
+      "01d5cf66-d51b-422a-af19-275f9bb53e9a": "HRKnowledge Advanced Find View",
+      "142bc698-1dd5-40e0-b246-57e8e25b001d": "HRKnowledge Associated View",
+      "675e126d-c8e1-495d-a9bf-3f5cc287a753": "Active HRKnowledge",
+      "854bb360-5459-4a17-809f-40d250b36de1": "Inactive HRKnowledge",
+      "93c224f2-0069-41cc-807c-57de672a80e9": "HRKnowledge Lookup View"
+    }
+  },
+  {
+    "DisplayName": "Status (HRKnowledge)",
+    "Name": "cr95c_hrknowledge_statecode",
+    "OptionSetInfoNameMapping": {
+      "0": "Active",
+      "1": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statecode",
+        "OptionSetReferenceEntityName": "HRKnowledge"
+      }
+    },
+    "OptionSetTypeKey": "StateType",
+    "RelatedColumnInvariantName": "statecode",
+    "RelatedEntityName": "HRKnowledge",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status Reason (HRKnowledge)",
+    "Name": "cr95c_hrknowledge_statuscode",
+    "OptionSetInfoNameMapping": {
+      "1": "Active",
+      "2": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statuscode",
+        "OptionSetReferenceEntityName": "HRKnowledge"
+      }
+    },
+    "OptionSetTypeKey": "StatusType",
+    "RelatedColumnInvariantName": "statuscode",
+    "RelatedEntityName": "HRKnowledge",
+    "Type": "OptionSetInfo"
+  }
+]

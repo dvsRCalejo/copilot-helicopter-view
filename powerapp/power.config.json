@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "appId": "3776a88a-6783-4611-ae97-b72b3913ceab",
+  "appDisplayName": "Copilot Helicopter View CodeApp",
+  "region": "prod",
+  "environmentId": "dd2f1319-46af-e4ee-974e-73d0bff77306",
+  "description": " ",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {},
+  "databaseReferences": {
+    "default.cds": {
+      "dataSources": {
+        "agents": {
+          "entitySetName": "bots",
+          "logicalName": "bot"
+        },
+        "conversationtranscripts": {
+          "entitySetName": "conversationtranscripts",
+          "logicalName": "conversationtranscript"
+        },
+        "users": {
+          "entitySetName": "systemusers",
+          "logicalName": "systemuser"
+        },
+        "organizations": {
+          "entitySetName": "organizations",
+          "logicalName": "organization"
+        }
+      },
+      "environmentVariableName": ""
+    }
+  }
+}

@@ -1,0 +1,39 @@
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files (contain secrets)
+.env
+.env.*
+!.env.example
+
+# Build outputs
+*.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Temp / verify
+.tmp/
+.vite/
+
+# Power Platform local cache
+powerapp/.power/cache/
+
+# Solution build outputs
+solution/bin/
+solution/obj/
+*.binlog

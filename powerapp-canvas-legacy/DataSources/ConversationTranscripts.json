@@ -1,0 +1,7 @@
+{
+  "DataSourceName": "Conversation Transcripts",
+  "Type": "CdsDataSource",
+  "EntityName": "conversationtranscripts",
+  "TableDisplayName": "Conversation Transcripts",
+  "DataSourceType": "Table"
+}

@@ -1,0 +1,20 @@
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_CLIENT_ID: ${VITE_CLIENT_ID}
+        VITE_TENANT_ID: ${VITE_TENANT_ID}
+        VITE_DATAVERSE_URL: ${VITE_DATAVERSE_URL}
+    image: copilot-helicopter-view:latest
+    container_name: copilot-helicopter-view
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

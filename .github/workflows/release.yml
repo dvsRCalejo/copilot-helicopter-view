@@ -1,0 +1,84 @@
+# ──────────────────────────────────────────────────────────────
+# Release workflow
+#
+# Triggers on a pushed tag like v1.0.0 or v1.2.0-beta.
+# Produces a GitHub Release with three artifacts:
+#   1. MyAgentsHelicopterView_<ver>_managed.zip   (managed solution)
+#   2. MyAgentsHelicopterView_<ver>_unmanaged.zip (unmanaged solution)
+#   3. webapp-docker.zip  (Dockerfile + docker-compose + nginx.conf + source)
+# ──────────────────────────────────────────────────────────────
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write          # create releases & upload assets
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # ── Checkout ──────────────────────────────────────────────
+      - uses: actions/checkout@v4
+
+      # ── Derive version string from tag ────────────────────────
+      - name: Set VERSION env
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      # ── 1. Build Power Platform solutions ─────────────────────
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/install@v1
+
+      - name: Pack unmanaged solution
+        uses: microsoft/powerplatform-actions/pack-solution@v1
+        with:
+          solution-folder: solution/src
+          solution-file: solution/MyAgentsHelicopterView_${{ env.VERSION }}_unmanaged.zip
+          solution-type: Unmanaged
+
+      - name: Pack managed solution
+        uses: microsoft/powerplatform-actions/pack-solution@v1
+        with:
+          solution-folder: solution/src
+          solution-file: solution/MyAgentsHelicopterView_${{ env.VERSION }}_managed.zip
+          solution-type: Managed
+
+      # ── 2. Bundle webapp Docker artifacts ─────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Create webapp Docker release bundle
+        run: |
+          mkdir -p _release/webapp
+          # Copy everything needed to docker build the webapp
+          cp -r webapp/src webapp/public webapp/package.json webapp/package-lock.json \
+                webapp/tsconfig.json webapp/tsconfig.node.json webapp/vite.config.ts \
+                webapp/index.html webapp/Dockerfile webapp/docker-compose.yml \
+                webapp/nginx.conf _release/webapp/ 2>/dev/null || true
+          # Include a .env.example for reference
+          if [ -f webapp/.env.example ]; then
+            cp webapp/.env.example _release/webapp/.env.example
+          else
+            cat > _release/webapp/.env.example <<'EOF'
+          VITE_CLIENT_ID=<your-entra-app-client-id>
+          VITE_TENANT_ID=<your-azure-ad-tenant-id>
+          VITE_DATAVERSE_URL=https://<your-org>.crm.dynamics.com
+          EOF
+          fi
+          cd _release && zip -r ../webapp-docker-${{ env.VERSION }}.zip webapp/
+
+      # ── 3. Create GitHub Release ──────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "v${{ env.VERSION }}"
+          generate_release_notes: true
+          files: |
+            solution/MyAgentsHelicopterView_${{ env.VERSION }}_managed.zip
+            solution/MyAgentsHelicopterView_${{ env.VERSION }}_unmanaged.zip
+            webapp-docker-${{ env.VERSION }}.zip

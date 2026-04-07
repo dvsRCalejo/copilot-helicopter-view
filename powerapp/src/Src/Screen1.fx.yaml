@@ -1,0 +1,201 @@
+Screen1 As screen:
+    Fill: =RGBA(243, 242, 241, 1)
+
+    RecHeader As rectangle:
+        Fill: =RGBA(0, 120, 212, 1)
+        Height: =64
+        Width: =Parent.Width
+        X: =0
+        Y: =0
+        ZIndex: =1
+
+    LblTitle As label:
+        Text: ="Copilot Helicopter View"
+        Color: =RGBA(255, 255, 255, 1)
+        FontWeight: =FontWeight.Bold
+        Size: =19
+        Height: =64
+        Width: =560
+        X: =20
+        Y: =0
+        ZIndex: =2
+
+    TxtSearch As text:
+        Default: =""
+        HintText: ="Search agents"
+        Height: =36
+        Width: =240
+        X: =Parent.Width - 260
+        Y: =78
+        ZIndex: =3
+
+    BtnAll As button:
+        Text: ="All"
+        OnSelect: =Set(gblFilterMode, "All")
+        Fill: =If(gblFilterMode = "All", RGBA(0,120,212,1), RGBA(237,235,233,1))
+        Color: =If(gblFilterMode = "All", RGBA(255,255,255,1), RGBA(50,49,48,1))
+        Height: =36
+        Width: =78
+        X: =20
+        Y: =78
+        ZIndex: =4
+
+    BtnOwned As button:
+        Text: ="Owned by me"
+        OnSelect: =Set(gblFilterMode, "Owned")
+        Fill: =If(gblFilterMode = "Owned", RGBA(0,120,212,1), RGBA(237,235,233,1))
+        Color: =If(gblFilterMode = "Owned", RGBA(255,255,255,1), RGBA(50,49,48,1))
+        Height: =36
+        Width: =122
+        X: =106
+        Y: =78
+        ZIndex: =5
+
+    BtnShared As button:
+        Text: ="Shared with me"
+        OnSelect: =Set(gblFilterMode, "Shared")
+        Fill: =If(gblFilterMode = "Shared", RGBA(0,120,212,1), RGBA(237,235,233,1))
+        Color: =If(gblFilterMode = "Shared", RGBA(255,255,255,1), RGBA(50,49,48,1))
+        Height: =36
+        Width: =134
+        X: =236
+        Y: =78
+        ZIndex: =6
+
+    BtnActive As button:
+        Text: ="Active only"
+        OnSelect: =Set(gblFilterMode, "Active")
+        Fill: =If(gblFilterMode = "Active", RGBA(0,120,212,1), RGBA(237,235,233,1))
+        Color: =If(gblFilterMode = "Active", RGBA(255,255,255,1), RGBA(50,49,48,1))
+        Height: =36
+        Width: =110
+        X: =378
+        Y: =78
+        ZIndex: =7
+
+    BtnSort As button:
+        Text: =If(gblSortMode = "Newest", "Newest first", "Oldest first")
+        OnSelect: =Set(gblSortMode, If(gblSortMode = "Newest", "Oldest", "Newest"))
+        Height: =36
+        Width: =130
+        X: =496
+        Y: =78
+        ZIndex: =8
+
+    RecResults As rectangle:
+        Fill: =RGBA(255, 255, 255, 1)
+        BorderColor: =RGBA(225, 223, 221, 1)
+        BorderThickness: =1
+        Height: =Parent.Height - 150
+        Width: =Parent.Width - 40
+        X: =20
+        Y: =128
+        ZIndex: =9
+
+    LblResults As label:
+        Text: |
+            =With(
+                {
+                    baseItems: Switch(
+                        gblFilterMode,
+                        "Owned", Filter(colAgents, IsOwner = true),
+                        "Shared", Filter(colAgents, IsOwner = false),
+                        "Active", Filter(colAgents, statecode = 0),
+                        colAgents
+                    ),
+                    searchTerm: Lower(Trim(TxtSearch.Text))
+                },
+                Concat(
+                    SortByColumns(
+                        If(
+                            IsBlank(searchTerm),
+                            baseItems,
+                            Filter(
+                                baseItems,
+                                searchTerm in Lower(name) || searchTerm in Lower(Coalesce(description, ""))
+                            )
+                        ),
+                        "modifiedon",
+                        If(gblSortMode = "Oldest", SortOrder.Ascending, SortOrder.Descending)
+                    ),
+                    "• " & name & "  |  " & If(IsOwner, "Owner", "Co-owner") &
+                    "  |  " & If(statecode = 0, "Active", "Inactive") &
+                    "  |  " & Text(TranscriptCount) & " transcripts  |  Modified " &
+                    Text(modifiedon, DateTimeFormat.ShortDate) & Char(10) &
+                    "   " & Coalesce(description, "No description") & Char(10) & Char(10)
+                )
+            )
+        AutoHeight: =false
+        Height: =Parent.Height - 170
+        Width: =Parent.Width - 80
+        X: =40
+        Y: =144
+        VerticalAlign: =VerticalAlign.Top
+        Wrap: =true
+        ZIndex: =10
+
+    LblCount As label:
+        Text: |
+            =With(
+                {
+                    baseItems: Switch(
+                        gblFilterMode,
+                        "Owned", Filter(colAgents, IsOwner = true),
+                        "Shared", Filter(colAgents, IsOwner = false),
+                        "Active", Filter(colAgents, statecode = 0),
+                        colAgents
+                    ),
+                    searchTerm: Lower(Trim(TxtSearch.Text))
+                },
+                CountRows(
+                    If(
+                        IsBlank(searchTerm),
+                        baseItems,
+                        Filter(
+                            baseItems,
+                            searchTerm in Lower(name) || searchTerm in Lower(Coalesce(description, ""))
+                        )
+                    )
+                ) & " agent(s)"
+            )
+        Color: =RGBA(96, 94, 92, 1)
+        Align: =Align.Right
+        Height: =22
+        Width: =180
+        X: =Parent.Width - 200
+        Y: =36
+        ZIndex: =11
+
+    LblEmpty As label:
+        Text: ="No agents found for current filter/search."
+        Visible: |
+            =With(
+                {
+                    baseItems: Switch(
+                        gblFilterMode,
+                        "Owned", Filter(colAgents, IsOwner = true),
+                        "Shared", Filter(colAgents, IsOwner = false),
+                        "Active", Filter(colAgents, statecode = 0),
+                        colAgents
+                    ),
+                    searchTerm: Lower(Trim(TxtSearch.Text))
+                },
+                CountRows(
+                    If(
+                        IsBlank(searchTerm),
+                        baseItems,
+                        Filter(
+                            baseItems,
+                            searchTerm in Lower(name) || searchTerm in Lower(Coalesce(description, ""))
+                        )
+                    )
+                ) = 0
+            )
+        Color: =RGBA(96, 94, 92, 1)
+        Align: =Align.Center
+        Height: =30
+        Width: =380
+        X: =(Parent.Width - 380) / 2
+        Y: =(Parent.Height - 30) / 2
+        ZIndex: =12
+

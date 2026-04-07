@@ -1,0 +1,398 @@
+AgentDetailScreen:
+  Properties:
+    Fill: =gblColorBg
+    OnVisible: |
+      =// Load transcripts for the selected agent when navigating to this screen
+      ClearCollect(
+        colTranscripts,
+        Filter(
+          'Conversation Transcripts',
+          Bot.Bot = gblSelectedAgent.botid
+        )
+      );
+      // Build analytics: session count per day (last 30 days)
+      ClearCollect(
+        colAnalyticsByDay,
+        AddColumns(
+          GroupBy(
+            AddColumns(
+              colTranscripts,
+              "DayKey",
+              Text(DateValue(Left(createdon, 10)), DateTimeFormat.ShortDate)
+            ),
+            "DayKey",
+            "Sessions"
+          ),
+          "SessionCount", CountRows(Sessions)
+        )
+      );
+      Set(gblDetailTab, "Analytics")
+
+  Children:
+
+    # ── Header ────────────────────────────────────────────────────────────────────
+    - recHeader:
+        Control: Rectangle
+        Properties:
+          Fill: =gblColorPrimary
+          Height: =64
+          Width: =Parent.Width
+          X: =0
+          Y: =0
+
+    - btnBack:
+        Control: Button
+        Properties:
+          Text: ="← Back"
+          OnSelect: =Navigate(HomeScreen, ScreenTransition.Fade)
+          Height: =36
+          Width: =80
+          X: =16
+          Y: =14
+          Fill: =RGBA(255,255,255,0.15)
+          Color: =RGBA(255,255,255,1)
+          BorderRadius: =6
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =13
+
+    - lblAgentName:
+        Control: Label
+        Properties:
+          Text: =gblSelectedAgent.Name
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Bold
+          Size: =18
+          Color: =RGBA(255,255,255,1)
+          Height: =64
+          Width: =Parent.Width - 250
+          X: =108
+          Y: =0
+          VerticalAlign: =VerticalAlign.Middle
+
+    - lblStatusBadge:
+        Control: Label
+        Properties:
+          Text: =If(gblSelectedAgent.statecode = 0, "● Active", "○ Inactive")
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =13
+          Color: =If(gblSelectedAgent.statecode = 0, RGBA(130,230,130,1), RGBA(255,180,180,1))
+          Height: =64
+          Width: =120
+          X: =Parent.Width - 140
+          Y: =0
+          VerticalAlign: =VerticalAlign.Middle
+          Align: =Align.Right
+
+    # ── Quick stats row ──────────────────────────────────────────────────────────
+    - recStats:
+        Control: Rectangle
+        Properties:
+          Fill: =gblColorSurface
+          Height: =80
+          Width: =Parent.Width
+          X: =0
+          Y: =64
+          BorderColor: =gblColorBorder
+          BorderThickness: =1
+
+    - lblTotalSessions:
+        Control: Label
+        Properties:
+          Text: ="Total Transcripts" & Char(10) & CountRows(colTranscripts)
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =14
+          Color: =gblColorText
+          Height: =60
+          Width: =200
+          X: =32
+          Y: =74
+          Align: =Align.Center
+
+    - lblRecentSessions:
+        Control: Label
+        Properties:
+          Text: ="Last 7 Days" & Char(10) & CountRows(Filter(colTranscripts, DateDiff(DateTimeValue(createdon), Now(), TimeUnit.Days) <= 7))
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =14
+          Color: =gblColorText
+          Height: =60
+          Width: =200
+          X: =250
+          Y: =74
+          Align: =Align.Center
+
+    - lblOwnedBy:
+        Control: Label
+        Properties:
+          Text: ="Owner" & Char(10) & If(gblSelectedAgent.IsOwner, "You", gblSelectedAgent.'Owning User'.'Full Name')
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =14
+          Color: =gblColorText
+          Height: =60
+          Width: =200
+          X: =468
+          Y: =74
+          Align: =Align.Center
+
+    - lblPublishedOn:
+        Control: Label
+        Properties:
+          Text: ="Published" & Char(10) & If(IsBlank(gblSelectedAgent.publishedon), "Not published", Text(DateTimeValue(gblSelectedAgent.publishedon), DateTimeFormat.ShortDate))
+          Font: =Font.'Segoe UI'
+          FontWeight: =FontWeight.Semibold
+          Size: =14
+          Color: =gblColorText
+          Height: =60
+          Width: =200
+          X: =686
+          Y: =74
+          Align: =Align.Center
+
+    # ── Tab bar ──────────────────────────────────────────────────────────────────
+    - recTabBar:
+        Control: Rectangle
+        Properties:
+          Fill: =gblColorSurface
+          Height: =44
+          Width: =Parent.Width
+          X: =0
+          Y: =144
+          BorderColor: =gblColorBorder
+          BorderThickness: =1
+
+    - btnTabAnalytics:
+        Control: Button
+        Properties:
+          Text: ="Analytics"
+          OnSelect: =Set(gblDetailTab, "Analytics")
+          Height: =44
+          Width: =140
+          X: =0
+          Y: =144
+          Fill: =RGBA(255,255,255,0)
+          Color: =If(gblDetailTab="Analytics", gblColorPrimary, gblColorTextMuted)
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =If(gblDetailTab="Analytics", FontWeight.Bold, FontWeight.Normal)
+          Size: =14
+
+    - recTabAnalyticsUnderline:
+        Control: Rectangle
+        Properties:
+          Fill: =If(gblDetailTab="Analytics", gblColorPrimary, RGBA(0,0,0,0))
+          Height: =3
+          Width: =140
+          X: =0
+          Y: =185
+
+    - btnTabTranscripts:
+        Control: Button
+        Properties:
+          Text: ="Transcripts (" & CountRows(colTranscripts) & ")"
+          OnSelect: =Set(gblDetailTab, "Transcripts")
+          Height: =44
+          Width: =160
+          X: =148
+          Y: =144
+          Fill: =RGBA(255,255,255,0)
+          Color: =If(gblDetailTab="Transcripts", gblColorPrimary, gblColorTextMuted)
+          BorderThickness: =0
+          Font: =Font.'Segoe UI'
+          FontWeight: =If(gblDetailTab="Transcripts", FontWeight.Bold, FontWeight.Normal)
+          Size: =14
+
+    - recTabTranscriptsUnderline:
+        Control: Rectangle
+        Properties:
+          Fill: =If(gblDetailTab="Transcripts", gblColorPrimary, RGBA(0,0,0,0))
+          Height: =3
+          Width: =160
+          X: =148
+          Y: =185
+
+    # ── Analytics tab content ────────────────────────────────────────────────────
+    - conAnalytics:
+        Control: GroupContainer
+        Properties:
+          Visible: =gblDetailTab = "Analytics"
+          Height: =Parent.Height - 192
+          Width: =Parent.Width
+          X: =0
+          Y: =192
+
+        Children:
+          - lblChartTitle:
+              Control: Label
+              Properties:
+                Text: ="Sessions per day (last 30 days)"
+                Font: =Font.'Segoe UI'
+                FontWeight: =FontWeight.Semibold
+                Size: =14
+                Color: =gblColorText
+                Height: =32
+                Width: =400
+                X: =24
+                Y: =16
+
+          - galAnalyticsChart:
+              Control: Gallery
+              Variant: galleryHorizontal
+              Properties:
+                Items: =Sort(colAnalyticsByDay, DayKey, SortOrder.Ascending)
+                Height: =200
+                Width: =Parent.Width - 48
+                X: =24
+                Y: =52
+                TemplatePadding: =4
+                TemplateWidth: =40
+                ShowScrollbar: =true
+              Children:
+                - recBar:
+                    Control: Rectangle
+                    Properties:
+                      Fill: =gblColorPrimary
+                      Width: =32
+                      Height: =ThisItem.SessionCount * 16
+                      X: =4
+                      Y: =200 - ThisItem.SessionCount * 16 - 24
+                      RadiusTopLeft: =4
+                      RadiusTopRight: =4
+                - lblBarValue:
+                    Control: Label
+                    Properties:
+                      Text: =Text(ThisItem.SessionCount)
+                      Size: =10
+                      Color: =gblColorPrimary
+                      Align: =Align.Center
+                      Height: =16
+                      Width: =40
+                      X: =0
+                      Y: =180 - ThisItem.SessionCount * 16 - 24
+                - lblBarDate:
+                    Control: Label
+                    Properties:
+                      Text: =Right(ThisItem.DayKey, 5)
+                      Size: =10
+                      Color: =gblColorTextMuted
+                      Align: =Align.Center
+                      Height: =20
+                      Width: =40
+                      X: =0
+                      Y: =180
+
+          - lblNoAnalytics:
+              Control: Label
+              Properties:
+                Visible: =CountRows(colAnalyticsByDay) = 0
+                Text: ="No transcript data available for analytics."
+                Font: =Font.'Segoe UI'
+                Size: =14
+                Color: =gblColorTextMuted
+                Align: =Align.Center
+                Height: =40
+                Width: =400
+                X: =(Parent.Width - 400) / 2
+                Y: =120
+
+    # ── Transcripts tab content ──────────────────────────────────────────────────
+    - conTranscripts:
+        Control: GroupContainer
+        Properties:
+          Visible: =gblDetailTab = "Transcripts"
+          Height: =Parent.Height - 192
+          Width: =Parent.Width
+          X: =0
+          Y: =192
+
+        Children:
+          - galTranscripts:
+              Control: Gallery
+              Variant: galleryVertical
+              Properties:
+                Items: =Sort(colTranscripts, createdon, SortOrder.Descending)
+                Height: =Parent.Height
+                Width: =Parent.Width - 32
+                X: =16
+                Y: =0
+                TemplateHeight: =72
+                TemplatePadding: =8
+                ShowScrollbar: =true
+              Children:
+                - recTranscriptCard:
+                    Control: Rectangle
+                    Properties:
+                      Fill: =gblColorSurface
+                      Height: =64
+                      Width: =Parent.TemplateWidth
+                      X: =0
+                      Y: =0
+                      BorderColor: =gblColorBorder
+                      BorderThickness: =1
+                      RadiusTopLeft: =6
+                      RadiusTopRight: =6
+                      RadiusBottomLeft: =6
+                      RadiusBottomRight: =6
+
+                - lblTranscriptName:
+                    Control: Label
+                    Properties:
+                      Text: =If(IsBlank(ThisItem.Name), "Session " & Left(ThisItem.conversationtranscriptid, 8), ThisItem.Name)
+                      Font: =Font.'Segoe UI'
+                      FontWeight: =FontWeight.Semibold
+                      Size: =13
+                      Color: =gblColorText
+                      Height: =24
+                      Width: =Parent.TemplateWidth - 160
+                      X: =16
+                      Y: =8
+
+                - lblTranscriptDate:
+                    Control: Label
+                    Properties:
+                      Text: =Text(DateTimeValue(ThisItem.createdon), DateTimeFormat.LongDateTime24)
+                      Font: =Font.'Segoe UI'
+                      Size: =12
+                      Color: =gblColorTextMuted
+                      Height: =20
+                      Width: =350
+                      X: =16
+                      Y: =36
+
+                - btnViewTranscript:
+                    Control: Button
+                    Properties:
+                      Text: ="View →"
+                      OnSelect: |
+                        =Set(gblSelectedTranscript, ThisItem);
+                        Navigate(TranscriptViewerScreen, ScreenTransition.Fade)
+                      Height: =30
+                      Width: =80
+                      X: =Parent.TemplateWidth - 96
+                      Y: =17
+                      Fill: =gblColorPrimary
+                      Color: =RGBA(255,255,255,1)
+                      BorderRadius: =6
+                      BorderThickness: =0
+                      Font: =Font.'Segoe UI'
+                      FontWeight: =FontWeight.Semibold
+                      Size: =12
+
+          - lblNoTranscripts:
+              Control: Label
+              Properties:
+                Visible: =CountRows(galTranscripts.AllItems) = 0
+                Text: ="No transcripts found for this agent."
+                Font: =Font.'Segoe UI'
+                Size: =14
+                Color: =gblColorTextMuted
+                Align: =Align.Center
+                Height: =40
+                Width: =400
+                X: =(Parent.Width - 400) / 2
+                Y: =120
