@@ -24,6 +24,46 @@ Two deliverables with aligned UX and shared data concepts:
 
 ---
 
+## Screenshots
+
+### 1. Dashboard overview
+
+![Dashboard overview](screenshots/helicopter-view-1.png)
+
+The landing view gives operators a tenant or environment-level summary of accessible agents, including visible count, active count, ownership split, recent conversation volume, and last updated agent. The card grid below is the main operational surface for finding an agent quickly.
+
+### 2. Agent detail overview
+
+![Agent detail overview](screenshots/helicopter-view-2.png)
+
+The agent detail page surfaces the core KPIs for a single agent: total sessions, resolution rate, abandonment, average duration, response time, engagement, and recent activity. This is the main diagnostic page when an owner wants to understand whether an agent is healthy or degrading.
+
+### 3. Outcome and engagement analytics
+
+![Outcome and engagement analytics](screenshots/helicopter-view-3.png)
+
+Conversation outcomes are broken down across resolved, abandoned, and unengaged sessions, alongside distribution views such as message depth and peak activity hours. These charts help identify whether issues are quality-related, adoption-related, or simply driven by usage timing.
+
+### 4. Response performance trends
+
+![Response performance trends](screenshots/helicopter-view-4.png)
+
+This section focuses on engagement intelligence and response-time trends over time. It is useful for spotting slowdowns, usage spikes, and behavioral patterns that may point to orchestration issues, knowledge latency, or overloaded dependent systems.
+
+### 5. Transcript catalog and filtering
+
+![Transcript catalog and filtering](screenshots/helicopter-view-5.png)
+
+The transcripts tab provides a searchable, filterable session index with date filtering, channel filtering, free-text search, and session counts. This supports investigation workflows where an owner needs to isolate a set of conversations by channel, timeframe, or keyword.
+
+### 6. Transcript conversation drill-down
+
+![Transcript conversation drill-down](screenshots/helicopter-view-6.png)
+
+Selecting a transcript opens the conversation in a chat-style modal, preserving turn order and speaker context. This lets owners move from aggregate telemetry to the actual conversation content that explains why a metric moved.
+
+---
+
 ## Quick Start
 
 ### Option A — Power App
