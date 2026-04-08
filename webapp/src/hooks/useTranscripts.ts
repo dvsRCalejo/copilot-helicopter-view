@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMsal } from '@azure/msal-react';
 import { getTranscripts } from '@/services/dataverseService';
 
-export function useTranscripts(botId: string | undefined) {
+export function useTranscripts(botId: string | undefined, instanceUrl: string | null | undefined) {
   const { instance, accounts } = useMsal();
   const account = accounts[0];
 
@@ -14,9 +14,9 @@ export function useTranscripts(botId: string | undefined) {
         const { MOCK_AGENT, MOCK_TRANSCRIPTS } = await import('@/dev/mockData');
         if (botId === MOCK_AGENT.botid) return MOCK_TRANSCRIPTS;
       }
-      return getTranscripts(botId!, instance, account);
+      return getTranscripts(botId!, instanceUrl!, instance, account);
     },
-    enabled: !!account && !!botId,
+    enabled: !!account && !!botId && !!instanceUrl,
     staleTime: 5 * 60 * 1000,
   });
 }

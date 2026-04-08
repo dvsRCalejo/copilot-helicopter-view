@@ -68,8 +68,9 @@ export const MOCK_AGENT: CopilotAgent = {
   runtimeprovider: 1,
   schemaname: 'cr_demohr',
   isOwner: true,
-  environmentId: null,
-  environmentDisplayName: null,
+  environmentId: 'dev-mock',
+  environmentDisplayName: 'Development (Mock)',
+  instanceUrl: 'https://dev.crm.dynamics.com',
 };
 
 // ── Dummy transcripts — spread across the last 30 days ───────────────────────

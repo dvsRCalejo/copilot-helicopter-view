@@ -21,6 +21,7 @@ const baseAgents: CopilotAgent[] = [
     isOwner: true,
     environmentId: null,
     environmentDisplayName: null,
+    instanceUrl: null,
   },
   {
     botid: '2',
@@ -40,6 +41,7 @@ const baseAgents: CopilotAgent[] = [
     isOwner: false,
     environmentId: null,
     environmentDisplayName: null,
+    instanceUrl: null,
   },
   {
     botid: '3',
@@ -59,6 +61,7 @@ const baseAgents: CopilotAgent[] = [
     isOwner: false,
     environmentId: null,
     environmentDisplayName: null,
+    instanceUrl: null,
   },
 ];
 

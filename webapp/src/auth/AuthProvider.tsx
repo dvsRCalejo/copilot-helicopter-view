@@ -1,17 +1,14 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import {
   MsalProvider,
   useMsal,
   useIsAuthenticated,
-  AuthenticatedTemplate,
-  UnauthenticatedTemplate,
 } from '@azure/msal-react';
-import { PublicClientApplication, InteractionStatus } from '@azure/msal-browser';
+import { PublicClientApplication } from '@azure/msal-browser';
 import { isAuthConfigured, loginRequest, missingAuthConfig, msalConfig } from './msalConfig';
 import {
   FluentProvider,
   webLightTheme,
-  Spinner,
   Button,
   makeStyles,
   tokens,
@@ -89,49 +86,34 @@ function ConfigError() {
 }
 
 function LoginGate({ children }: { children: ReactNode }) {
-  const { instance, inProgress } = useMsal();
+  const { instance } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const styles = useStyles();
 
-  useEffect(() => {
-    if (!isAuthenticated && inProgress === InteractionStatus.None) {
-      instance.loginRedirect(loginRequest).catch(console.error);
-    }
-  }, [isAuthenticated, inProgress, instance]);
-
-  if (inProgress !== InteractionStatus.None) {
+  if (!isAuthenticated) {
     return (
       <div className={styles.loginPage}>
-        <Spinner size="large" label="Signing in…" />
+        <div className={styles.loginCard}>
+          <Text className={styles.heading}>🚁</Text>
+          <Text weight="bold" size={600}>
+            Copilot Helicopter View
+          </Text>
+          <Text className={styles.sub}>
+            Sign in with your Microsoft account to view your Copilot Studio agents.
+          </Text>
+          <Button
+            appearance="primary"
+            size="large"
+            onClick={() => instance.loginPopup(loginRequest).catch(console.error)}
+          >
+            Sign in
+          </Button>
+        </div>
       </div>
     );
   }
 
-  return (
-    <>
-      <AuthenticatedTemplate>{children}</AuthenticatedTemplate>
-      <UnauthenticatedTemplate>
-        <div className={styles.loginPage}>
-          <div className={styles.loginCard}>
-            <Text className={styles.heading}>🚁</Text>
-            <Text weight="bold" size={600}>
-              Copilot Helicopter View
-            </Text>
-            <Text className={styles.sub}>
-              Sign in with your Microsoft account to view your Copilot Studio agents.
-            </Text>
-            <Button
-              appearance="primary"
-              size="large"
-              onClick={() => instance.loginPopup(loginRequest).catch(console.error)}
-            >
-              Sign in
-            </Button>
-          </div>
-        </div>
-      </UnauthenticatedTemplate>
-    </>
-  );
+  return <>{children}</>;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

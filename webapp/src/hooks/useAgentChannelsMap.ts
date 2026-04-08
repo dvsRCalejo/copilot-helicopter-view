@@ -24,7 +24,9 @@ export function useAgentChannelsMap(agents: CopilotAgent[]) {
           const { MOCK_AGENT, MOCK_TRANSCRIPTS } = await import('@/dev/mockData');
           if (botId === MOCK_AGENT.botid) return MOCK_TRANSCRIPTS;
         }
-        return getTranscripts(botId, instance, account);
+        const agent = agents.find((a) => a.botid === botId);
+        if (!agent?.instanceUrl) return [];
+        return getTranscripts(botId, agent.instanceUrl, instance, account);
       },
       enabled: !!account,
       staleTime: 5 * 60 * 1000,

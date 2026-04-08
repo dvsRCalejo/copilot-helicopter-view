@@ -109,7 +109,7 @@ export function AgentDetail() {
     data: transcripts,
     isLoading: transcriptsLoading,
     error: transcriptsError,
-  } = useTranscripts(botId);
+  } = useTranscripts(botId, agent?.instanceUrl);
 
   const { analytics, sessions } = useAnalytics(transcripts);
 

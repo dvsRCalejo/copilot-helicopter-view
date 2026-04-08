@@ -1,9 +1,6 @@
 import { AccountInfo, IPublicClientApplication, InteractionRequiredAuthError } from '@azure/msal-browser';
-import { dataverseScopes } from '@/auth/msalConfig';
+import { dataverseScopesFor } from '@/auth/msalConfig';
 import type { CopilotAgent, ConversationTranscript, PowerPlatformEnvironment, WhoAmIResponse } from '@/types';
-
-const DATAVERSE_URL = import.meta.env.VITE_DATAVERSE_URL as string;
-const API_BASE = `${DATAVERSE_URL}/api/data/v9.2`;
 
 /** Power Platform API token scope */
 const POWER_PLATFORM_SCOPE = 'https://service.powerapps.com/.default';
@@ -19,7 +16,7 @@ const DEFAULT_HEADERS = {
 async function acquireToken(
   msalInstance: IPublicClientApplication,
   account: AccountInfo,
-  scopes: string[] = dataverseScopes
+  scopes: string[]
 ): Promise<string> {
   try {
     const result = await msalInstance.acquireTokenSilent({ account, scopes });
@@ -34,12 +31,14 @@ async function acquireToken(
 }
 
 async function dataverseFetch<T>(
+  instanceUrl: string,
   path: string,
   msalInstance: IPublicClientApplication,
   account: AccountInfo
 ): Promise<T> {
-  const token = await acquireToken(msalInstance, account);
-  const response = await fetch(`${API_BASE}/${path}`, {
+  const apiBase = `${instanceUrl.replace(/\/$/, '')}/api/data/v9.2`;
+  const token = await acquireToken(msalInstance, account, dataverseScopesFor(instanceUrl));
+  const response = await fetch(`${apiBase}/${path}`, {
     headers: {
       ...DEFAULT_HEADERS,
       Authorization: `Bearer ${token}`,
@@ -55,46 +54,16 @@ async function dataverseFetch<T>(
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export async function whoAmI(
+  instanceUrl: string,
   msalInstance: IPublicClientApplication,
   account: AccountInfo
 ): Promise<WhoAmIResponse> {
-  return dataverseFetch<WhoAmIResponse>('WhoAmI()', msalInstance, account);
-}
-
-export async function getAgents(
-  msalInstance: IPublicClientApplication,
-  account: AccountInfo
-): Promise<CopilotAgent[]> {
-  // Dataverse implicit row-level security returns only records the signed-in
-  // user can read (owned + shared). No client-side security filter needed.
-  const select = [
-    'botid',
-    'name',
-    'iconbase64',
-    'statecode',
-    'statuscode',
-    'publishedon',
-    'createdon',
-    'modifiedon',
-    '_owninguser_value',
-    '_ownerid_value',
-    'description',
-    'language',
-    'runtimeprovider',
-    'schemaname',
-    'configuration',
-  ].join(',');
-
-  const result = await dataverseFetch<{ value: CopilotAgent[] }>(
-    `bots?$select=${select}&$orderby=modifiedon%20desc`,
-    msalInstance,
-    account
-  );
-  return result.value.map((a) => ({ ...a, environmentId: null, environmentDisplayName: null }));
+  return dataverseFetch<WhoAmIResponse>(instanceUrl, 'WhoAmI()', msalInstance, account);
 }
 
 export async function getTranscripts(
   botId: string,
+  instanceUrl: string,
   msalInstance: IPublicClientApplication,
   account: AccountInfo
 ): Promise<ConversationTranscript[]> {
@@ -112,6 +81,7 @@ export async function getTranscripts(
   // Encode the bot GUID for safe URL embedding
   const filter = `_bot_conversationtranscriptid_value%20eq%20${encodeURIComponent(botId)}`;
   const result = await dataverseFetch<{ value: ConversationTranscript[] }>(
+    instanceUrl,
     `conversationtranscripts?$select=${select}&$filter=${filter}&$orderby=createdon%20desc&$top=200`,
     msalInstance,
     account
@@ -172,13 +142,12 @@ export async function getAgentsForEnvironment(
   account: AccountInfo
 ): Promise<CopilotAgent[]> {
   const envApiBase = `${env.instanceUrl}/api/data/v9.2`;
-  const scope = `${env.instanceUrl}/.default`;
-  const token = await acquireToken(msalInstance, account, [scope]);
+  const scopes = dataverseScopesFor(env.instanceUrl);
+  const token = await acquireToken(msalInstance, account, scopes);
 
+  // Use only universally-available Dataverse fields to avoid 400 errors across different tenants
   const select = [
-    'botid', 'name', 'iconbase64', 'statecode', 'statuscode', 'publishedon',
-    'createdon', 'modifiedon', '_owninguser_value', '_ownerid_value',
-    'description', 'language', 'runtimeprovider', 'schemaname',
+    'botid', 'name', 'statecode', 'statuscode', 'createdon', 'modifiedon', '_owninguser_value',
   ].join(',');
 
   const response = await fetch(
@@ -190,14 +159,31 @@ export async function getAgentsForEnvironment(
       },
     }
   );
+
   if (!response.ok) {
     const text = await response.text().catch(() => '');
     throw new Error(`Dataverse [${env.displayName}] ${response.status}: ${response.statusText} — ${text.slice(0, 200)}`);
   }
-  const data = (await response.json()) as { value: CopilotAgent[] };
-  return data.value.map((a) => ({
-    ...a,
+
+  const raw = (await response.json()) as { value: Array<Partial<CopilotAgent>> };
+  return (raw.value || []).map((a) => ({
+    botid: a.botid ?? '',
+    name: a.name ?? 'Unnamed agent',
+    iconbase64: null,
+    statecode: a.statecode ?? 0,
+    statuscode: a.statuscode ?? 1,
+    publishedon: null,
+    createdon: a.createdon ?? '',
+    modifiedon: a.modifiedon ?? '',
+    _owninguser_value: a._owninguser_value ?? null,
+    _ownerid_value: a._ownerid_value ?? null,
+    description: null,
+    language: 0,
+    runtimeprovider: null,
+    schemaname: null,
+    configuration: null,
     environmentId: env.environmentId,
     environmentDisplayName: env.displayName,
+    instanceUrl: env.instanceUrl,
   }));
 }

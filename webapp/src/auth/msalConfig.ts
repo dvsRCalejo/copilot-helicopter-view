@@ -2,12 +2,10 @@ import { Configuration, PopupRequest } from '@azure/msal-browser';
 
 const clientId = import.meta.env.VITE_CLIENT_ID as string;
 const tenantId = import.meta.env.VITE_TENANT_ID as string;
-const dataverseUrl = import.meta.env.VITE_DATAVERSE_URL as string;
 
 const missingConfig: string[] = [];
 if (!clientId) missingConfig.push('VITE_CLIENT_ID');
 if (!tenantId) missingConfig.push('VITE_TENANT_ID');
-if (!dataverseUrl) missingConfig.push('VITE_DATAVERSE_URL');
 
 export const isAuthConfigured = missingConfig.length === 0;
 export const missingAuthConfig = missingConfig;
@@ -31,9 +29,12 @@ export const msalConfig: Configuration = {
   },
 };
 
-/** Scopes required to call the Dataverse Web API as the signed-in user */
-export const dataverseScopes: string[] = [`${dataverseUrl}/.default`];
+/** Returns the Dataverse OAuth scope for a given environment instance URL. */
+export function dataverseScopesFor(instanceUrl: string): string[] {
+  return [`${instanceUrl.replace(/\/$/, '')}/user_impersonation`];
+}
 
+/** Initial login: minimal scope only. Resource-specific scopes added via incremental consent. */
 export const loginRequest: PopupRequest = {
-  scopes: dataverseScopes,
+  scopes: ['User.Read'],
 };

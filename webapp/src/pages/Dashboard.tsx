@@ -209,8 +209,10 @@ export function Dashboard() {
   const [search, setSearch] = useState('');
   const [environmentId, setEnvironmentId] = useState<string | null>(null);
 
-  const { data: environments = [] } = useEnvironments();
-  const { data: agents = [], isLoading, error, refetch } = useAgents(filter, environmentId);
+  const { data: environments = [], isLoading: envsLoading, error: envsError } = useEnvironments();
+  const { data: agents = [], isLoading: agentsLoading, error: agentsError, refetch } = useAgents(filter, environmentId);
+  const isLoading = envsLoading || agentsLoading;
+  const error = envsError ?? agentsError;
 
   const sorted = searchAndSortAgents(agents, search);
   const { channelsMap, allTranscripts } = useAgentChannelsMap(agents);

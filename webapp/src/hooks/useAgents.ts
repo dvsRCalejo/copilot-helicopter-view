@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMsal } from '@azure/msal-react';
-import { getAgents, getAgentsForEnvironment, getEnvironments } from '@/services/dataverseService';
+import { getAgentsForEnvironment } from '@/services/dataverseService';
 import { useCurrentUser } from './useCurrentUser';
+import { useEnvironments } from './useEnvironments';
 import type { CopilotAgent, FilterMode } from '@/types';
 import { filterAgents } from '@/utils/agentList';
 
@@ -32,23 +33,15 @@ export function useAgents(filter: FilterMode = 'all', environmentId: string | nu
   const { instance, accounts } = useMsal();
   const account = accounts[0];
   const { data: currentUser } = useCurrentUser();
+  const { data: allEnvs = [] } = useEnvironments();
 
   const query = useQuery({
-    queryKey: ['agents', environmentId],
+    queryKey: ['agents', environmentId, allEnvs.map((e) => e.environmentId).join(',')],
     queryFn: async () => {
-      if (environmentId !== null) {
-        // Single environment — direct fan-out for the selected env
-        const envs = await getEnvironments(instance, account);
-        const env = envs.find((e) => e.environmentId === environmentId);
-        if (!env) return [];
-        return getAgentsForEnvironment(env, instance, account);
-      }
-      // All environments — fan-out, aggregate, deduplicate by botid+environmentId
-      const envs = await getEnvironments(instance, account);
-      if (envs.length === 0) {
-        // Fallback to single-env (current Dataverse URL)
-        return getAgents(instance, account);
-      }
+      const envs = environmentId !== null
+        ? allEnvs.filter((e) => e.environmentId === environmentId)
+        : allEnvs;
+      if (envs.length === 0) return [];
       const results = await Promise.allSettled(
         envs.map((env) => getAgentsForEnvironment(env, instance, account))
       );
@@ -56,7 +49,7 @@ export function useAgents(filter: FilterMode = 'all', environmentId: string | nu
         .filter((r): r is PromiseFulfilledResult<CopilotAgent[]> => r.status === 'fulfilled')
         .flatMap((r) => r.value);
     },
-    enabled: !!account,
+    enabled: !!account && allEnvs.length > 0,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 

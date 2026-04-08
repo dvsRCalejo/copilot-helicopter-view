@@ -33,6 +33,8 @@ export interface CopilotAgent {
   /** Power Platform environment this agent was loaded from */
   environmentId: string | null;
   environmentDisplayName: string | null;
+  /** Dataverse instance URL this agent was loaded from — used for scoped API calls */
+  instanceUrl: string | null;
 }
 
 export interface ConversationTranscript {
