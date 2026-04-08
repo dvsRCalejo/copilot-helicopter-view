@@ -2,15 +2,19 @@ import { useMemo } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { useMsal } from '@azure/msal-react';
 import { getTranscripts } from '@/services/dataverseService';
-import { extractChannel, getChannelInfo } from '@/types';
+import { extractConfiguredChannels, getChannelInfo } from '@/types';
+import type { ConversationTranscript, CopilotAgent } from '@/types';
 
 /**
  * Batch-fetches transcripts for a list of agents and extracts de-duplicated
- * channel info per bot.  Shares the same TanStack cache as useTranscripts.
+ * channel info per bot from agent publish/config metadata.
+ * Shares the same TanStack cache as useTranscripts.
+ * Also returns all transcripts flattened (for dashboard activity metrics).
  */
-export function useAgentChannelsMap(botIds: string[]) {
+export function useAgentChannelsMap(agents: CopilotAgent[]) {
   const { instance, accounts } = useMsal();
   const account = accounts[0];
+  const botIds = useMemo(() => agents.map((a) => a.botid), [agents]);
 
   const results = useQueries({
     queries: botIds.map((botId) => ({
@@ -27,22 +31,29 @@ export function useAgentChannelsMap(botIds: string[]) {
     })),
   });
 
-  return useMemo(() => {
+  const channelsMap = useMemo(() => {
     const map = new Map<string, { label: string; icon: string }[]>();
-    results.forEach((result, i) => {
-      if (!result.data) return;
+    agents.forEach((agent) => {
       const labelMap = new Map<string, { label: string; icon: string }>();
-      for (const t of result.data) {
-        const ch = extractChannel(t.content);
-        if (ch) {
-          const info = getChannelInfo(ch);
-          if (!labelMap.has(info.label)) labelMap.set(info.label, info);
-        }
+      const configuredChannels = extractConfiguredChannels(agent.configuration);
+      for (const channelId of configuredChannels) {
+        const info = getChannelInfo(channelId);
+        if (!labelMap.has(info.label)) labelMap.set(info.label, info);
       }
       if (labelMap.size > 0) {
-        map.set(botIds[i], Array.from(labelMap.values()));
+        map.set(agent.botid, Array.from(labelMap.values()));
       }
     });
     return map;
-  }, [results, botIds]);
+  }, [agents]);
+
+  const allTranscripts = useMemo(() => {
+    const all: ConversationTranscript[] = [];
+    for (const r of results) {
+      if (r.data) all.push(...r.data);
+    }
+    return all;
+  }, [results]);
+
+  return { channelsMap, allTranscripts };
 }

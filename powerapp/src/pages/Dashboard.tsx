@@ -14,23 +14,25 @@ export function Dashboard() {
   const { data: environments = [] } = useEnvironments();
   const { data: agents = [], isLoading, error, refetch } = useAgents(filter, environmentId);
   const sorted = searchAndSortAgents(agents, search);
-  const botIds = useMemo(() => agents.map((a) => a.botid), [agents]);
-  const channelsMap = useAgentChannelsMap(botIds);
+  const { channelsMap, allTranscripts } = useAgentChannelsMap(agents);
   const activeCount = agents.filter((agent) => agent.statecode === 0).length;
   const ownedCount = agents.filter((agent) => agent.isOwner).length;
   const sharedCount = Math.max(agents.length - ownedCount, 0);
-  const updatedLast7Days = agents.filter((agent) => {
-    const modified = Date.parse(agent.modifiedon);
-    return Number.isFinite(modified) && Date.now() - modified <= 7 * 24 * 60 * 60 * 1000;
-  }).length;
+  const conversationsLast7Days = useMemo(() => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return allTranscripts.filter((t) => {
+      const created = Date.parse(t.createdon);
+      return Number.isFinite(created) && created >= cutoff;
+    }).length;
+  }, [allTranscripts]);
 
-  // 7-day sparkline data
+  // 7-day sparkline data (conversations per day)
   const dayMs = 86_400_000;
   const nowMs = Date.now();
-  const sparkData = Array.from({ length: 7 }, (_, i) => {
+  const sparkData = useMemo(() => Array.from({ length: 7 }, (_, i) => {
     const lo = nowMs - (6 - i) * dayMs;
-    return agents.filter((a) => { const t = Date.parse(a.modifiedon); return t >= lo && t < lo + dayMs; }).length;
-  });
+    return allTranscripts.filter((t) => { const c = Date.parse(t.createdon); return c >= lo && c < lo + dayMs; }).length;
+  }), [allTranscripts, nowMs]);
   const sparkMax = Math.max(...sparkData, 1);
   const sparkPoints = sparkData.map((v, i) => `${(i / 6) * 100},${100 - (v / sparkMax) * 80}`).join(' ');
 
@@ -113,8 +115,8 @@ export function Dashboard() {
             <span className="hero-panel__insight-label">Shared with you</span>
           </div>
           <div className="hero-panel__insight-card">
-            <span className="hero-panel__insight-eyebrow">Activity · 7 days</span>
-            <span className="hero-panel__insight-value">{updatedLast7Days}</span>
+            <span className="hero-panel__insight-eyebrow">Conversations · 7 days</span>
+            <span className="hero-panel__insight-value">{conversationsLast7Days}</span>
             <svg className="hero-panel__sparkline" viewBox="0 0 100 100" preserveAspectRatio="none">
               <polyline points={`0,100 ${sparkPoints} 100,100`} fill="rgba(110, 193, 255, 0.15)" stroke="none" />
               <polyline points={sparkPoints} fill="none" stroke="rgba(110,193,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />

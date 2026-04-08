@@ -27,6 +27,8 @@ export interface CopilotAgent {
   /** 0 = Classic, 1 = Generative */
   runtimeprovider: number | null;
   schemaname: string | null;
+  /** Bot configuration JSON payload from Dataverse (contains channel publish metadata) */
+  configuration?: string | null;
   /** Computed by the app — true when owner principal matches the signed-in user */
   isOwner?: boolean;
   /** Power Platform environment this agent was loaded from */
@@ -73,7 +75,11 @@ export function isUserRole(activity: BotActivity): boolean {
 }
 
 const CHANNEL_LABELS: Record<string, { label: string; icon: string }> = {
-  msteams:       { label: 'Teams',       icon: '💬' },
+  msteams:       { label: 'M365 Copilot Chat + Teams', icon: '💬' },
+  teams:         { label: 'M365 Copilot Chat + Teams', icon: '💬' },
+  m365copilot:   { label: 'M365 Copilot Chat + Teams', icon: '🧠' },
+  microsoft365copilot: { label: 'M365 Copilot Chat + Teams', icon: '🧠' },
+  copilotm365:   { label: 'M365 Copilot Chat + Teams', icon: '🧠' },
   directline:    { label: 'Web Chat',    icon: '🌐' },
   webchat:       { label: 'Web Chat',    icon: '🌐' },
   facebook:      { label: 'Facebook',    icon: '📘' },
@@ -81,6 +87,7 @@ const CHANNEL_LABELS: Record<string, { label: string; icon: string }> = {
   telegram:      { label: 'Telegram',    icon: '✈️' },
   email:         { label: 'Email',       icon: '📧' },
   sms:           { label: 'SMS',         icon: '📱' },
+  sharepoint:    { label: 'SharePoint',  icon: '📄' },
   line:          { label: 'LINE',        icon: '💚' },
   twilio:        { label: 'Twilio',      icon: '📞' },
   omnichannel:   { label: 'Omnichannel', icon: '🔄' },
@@ -94,6 +101,63 @@ export function getChannelInfo(channelId: string | undefined): { label: string; 
   return CHANNEL_LABELS[key] ?? { label: channelId, icon: '💬' };
 }
 
+function toChannelKey(raw: string): string | undefined {
+  const v = raw.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!v) return undefined;
+  if (CHANNEL_LABELS[v]) return v;
+  if (v.includes('microsoft365copilot') || v.includes('m365copilot') || v.includes('copilotm365')) return 'm365copilot';
+  if (v.includes('msteams') || v === 'teams' || v.includes('teamschannel')) return 'msteams';
+  if (v.includes('sharepoint')) return 'sharepoint';
+  if (v.includes('directline')) return 'directline';
+  if (v.includes('webchat')) return 'webchat';
+  if (v.includes('facebook')) return 'facebook';
+  if (v.includes('slack')) return 'slack';
+  if (v.includes('telegram')) return 'telegram';
+  if (v.includes('email')) return 'email';
+  if (v.includes('sms')) return 'sms';
+  if (v.includes('line')) return 'line';
+  if (v.includes('twilio')) return 'twilio';
+  if (v.includes('omnichannel')) return 'omnichannel';
+  return undefined;
+}
+
+/**
+ * Extracts channel IDs from agent configuration JSON.
+ * This is used for agent-card badges (published channels), independent of transcript activity.
+ */
+export function extractConfiguredChannels(configuration: string | null | undefined): string[] {
+  if (!configuration) return [];
+  try {
+    const parsed: unknown = JSON.parse(configuration);
+    const found = new Set<string>();
+
+    const visit = (value: unknown): void => {
+      if (typeof value === 'string') {
+        const key = toChannelKey(value);
+        if (key) found.add(key);
+        return;
+      }
+      if (Array.isArray(value)) {
+        value.forEach(visit);
+        return;
+      }
+      if (value && typeof value === 'object') {
+        const entries = Object.entries(value as Record<string, unknown>);
+        for (const [k, v] of entries) {
+          const key = toChannelKey(k);
+          if (key) found.add(key);
+          visit(v);
+        }
+      }
+    };
+
+    visit(parsed);
+    return Array.from(found);
+  } catch {
+    return [];
+  }
+}
+
 /** Extract the channelId from the first activity in a transcript's content JSON */
 export function extractChannel(content: string | null): string | undefined {
   if (!content) return undefined;
@@ -102,8 +166,18 @@ export function extractChannel(content: string | null): string | undefined {
     const activities: unknown[] = Array.isArray(parsed)
       ? parsed
       : (parsed as { activities?: unknown[] }).activities ?? [];
-    const first = activities[0] as BotActivity | undefined;
-    return first?.channelId ?? undefined;
+
+    // Some transcript payloads omit channelId in the first activity.
+    // Scan all activities and return the first valid channelId found.
+    for (const item of activities) {
+      const act = item as BotActivity | undefined;
+      const channel = act?.channelId;
+      if (typeof channel === 'string' && channel.trim().length > 0) {
+        return channel;
+      }
+    }
+
+    return undefined;
   } catch {
     return undefined;
   }

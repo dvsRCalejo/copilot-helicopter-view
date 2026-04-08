@@ -19,7 +19,7 @@ import type { CopilotAgent, ConversationTranscript, PowerPlatformEnvironment, Wh
 const BOT_SELECT = [
   'botid', 'name', 'iconbase64', 'statecode', 'statuscode', 'publishedon',
   'createdon', 'modifiedon', '_owninguser_value',
-  'ownerid', 'language', 'runtimeprovider', 'schemaname',
+  'ownerid', 'language', 'runtimeprovider', 'schemaname', 'configuration',
 ];
 
 const TRANSCRIPT_SELECT = [
@@ -90,6 +90,7 @@ export async function whoAmI(): Promise<WhoAmIResponse> {
  * Dataverse row-level security automatically scopes results to accessible records.
  */
 export async function getAgents(): Promise<CopilotAgent[]> {
+  const ctx = await getContext();
   const result = await BotsService.getAll({
     select: BOT_SELECT,
     orderBy: ['modifiedon desc'],
@@ -109,7 +110,8 @@ export async function getAgents(): Promise<CopilotAgent[]> {
     language: b.language ?? 1033,
     runtimeprovider: b.runtimeprovider ?? null,
     schemaname: b.schemaname ?? null,
-    environmentId: null,
+    configuration: b.configuration ?? null,
+    environmentId: ctx.app.environmentId,
     environmentDisplayName: null,
   }));
 }

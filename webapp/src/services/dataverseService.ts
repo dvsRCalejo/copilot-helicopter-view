@@ -82,6 +82,7 @@ export async function getAgents(
     'language',
     'runtimeprovider',
     'schemaname',
+    'configuration',
   ].join(',');
 
   const result = await dataverseFetch<{ value: CopilotAgent[] }>(

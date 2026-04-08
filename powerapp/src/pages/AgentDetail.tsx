@@ -5,7 +5,7 @@ import { useTranscripts } from '@/hooks/useTranscripts';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { TranscriptViewer } from '@/components/TranscriptViewer';
-import { extractChannel, getChannelInfo } from '@/types';
+import { extractConfiguredChannels, getChannelInfo } from '@/types';
 
 type TabKey = 'analytics' | 'transcripts';
 
@@ -26,17 +26,14 @@ export function AgentDetail() {
   const { analytics, sessions } = useAnalytics(transcripts);
 
   const channels = useMemo(() => {
-    if (!transcripts) return [];
+    if (!agent?.configuration) return [];
     const labelMap = new Map<string, { label: string; icon: string }>();
-    for (const t of transcripts) {
-      const ch = extractChannel(t.content);
-      if (ch) {
-        const info = getChannelInfo(ch);
-        if (!labelMap.has(info.label)) labelMap.set(info.label, info);
-      }
+    for (const channelId of extractConfiguredChannels(agent.configuration)) {
+      const info = getChannelInfo(channelId);
+      if (!labelMap.has(info.label)) labelMap.set(info.label, info);
     }
     return Array.from(labelMap.values());
-  }, [transcripts]);
+  }, [agent?.configuration]);
 
   if (agentsLoading) {
     return (
@@ -59,6 +56,9 @@ export function AgentDetail() {
   }
 
   const isActive = agent.statecode === 0;
+  const agentStudioUrl = agent.environmentId
+    ? `https://copilotstudio.microsoft.com/environments/${encodeURIComponent(agent.environmentId)}/bots/${encodeURIComponent(agent.botid)}`
+    : null;
 
   return (
     <div className="page">
@@ -92,6 +92,13 @@ export function AgentDetail() {
               </div>
             )}
             {agent.description && <p className="agent-detail__desc">{agent.description}</p>}
+            {agentStudioUrl && (
+              <p className="agent-detail__desc" style={{ marginTop: 8 }}>
+                <a href={agentStudioUrl} target="_blank" rel="noreferrer" className="btn btn--ghost btn--sm">
+                  Open in Copilot Studio ↗
+                </a>
+              </p>
+            )}
           </div>
 
           <div className="agent-detail__meta agent-detail__meta--panel">

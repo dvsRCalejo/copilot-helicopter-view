@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CanvasApp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Name>rcalejo_copilothelicopterviewcodeapp_59d09</Name>
-  <AppVersion>2026-04-07T22:40:19Z</AppVersion>
+  <AppVersion>2026-04-08T00:01:20Z</AppVersion>
   <Status>Ready</Status>
   <CreatedByClientVersion>0.0.0.0</CreatedByClientVersion>
   <MinClientVersion>0.0.0.0</MinClientVersion>
@@ -28,8 +28,8 @@
   <IsCustomizable>1</IsCustomizable>
   <CodeAppPackageUris>
     <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/index.html_ContentType_text/html</CodeAppPackageUri>
-    <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/assets/AgentDetail-DXDK9fEk.js_ContentType_application/javascript</CodeAppPackageUri>
-    <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/assets/index-DdHsYdF2.js_ContentType_application/javascript</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/assets/AgentDetail-CsZ0_YCo.js_ContentType_application/javascript</CodeAppPackageUri>
+    <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/assets/index-BdcH0w8s.js_ContentType_application/javascript</CodeAppPackageUri>
     <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/assets/index-MTGlQHst.css_ContentType_text/css</CodeAppPackageUri>
     <CodeAppPackageUri>/CanvasApps/rcalejo_copilothelicopterviewcodeapp_59d09_CodeAppPackages/vite.svg_ContentType_image/svg+xml</CodeAppPackageUri>
   </CodeAppPackageUris>
