@@ -9,6 +9,7 @@ Two deliverables with aligned UX and shared data concepts:
 | **Stack**      | Power Apps Code Apps (Vite + React + @microsoft/power-apps) | React 18 + TypeScript + Vite + Fluent UI v9 |
 | **Auth**       | Power Platform native (AAD)                                 | MSAL.js v3 (popup/redirect)                 |
 | **Data**       | Dataverse connector + `systemusers` lookup for owner label  | Dataverse Web API (delegated)               |
+| **Environment scope** | Single environment (the app's bound Power Platform environment) | Multi-environment (aggregates all accessible environments) |
 | **Deployment** | `power-apps push` to Power Platform environment             | Docker container (nginx)                    |
 
 ---
@@ -41,6 +42,8 @@ npx power-apps push
 ```
 
 See [powerapp/README.md](powerapp/README.md) for full instructions.
+
+Note: this implementation is environment-scoped. It only shows agents in the environment the app is installed/bound to.
 
 ---
 
@@ -81,6 +84,27 @@ npm install
 cp .env.example .env   # fill in values
 npm run dev            # http://localhost:5173
 ```
+
+Note: this implementation is environment-agnostic. It discovers all environments the signed-in user can access and aggregates agents across them.
+
+---
+
+## Environment Scope Differences
+
+Use this guide when deciding which implementation to use:
+
+| Scenario | Power App | Webapp |
+| -------- | --------- | ------ |
+| Need visibility across all environments in a tenant | Not suitable (single environment) | Recommended |
+| Need a solution fully hosted inside Power Platform environment lifecycle | Recommended | Not primary goal |
+| Need central operations dashboard for owners/co-owners across environments | Limited | Recommended |
+| Environment-to-environment rollout isolation | Strong (each app instance is environment-bound) | Centralized view by design |
+
+Why both exist:
+
+- Power App aligns with environment-bound app governance and deployment.
+- Webapp provides tenant-wide operational visibility with environment fan-out.
+- Both maintain the same ownership and transcript semantics, but differ in scope boundary.
 
 ---
 
