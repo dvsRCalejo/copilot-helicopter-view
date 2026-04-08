@@ -50,8 +50,12 @@ See [powerapp/README.md](powerapp/README.md) for full instructions.
 
 1. Go to [Entra admin center](https://entra.microsoft.com) → App registrations → New registration
 2. Name: `CopilotHelicopterView`
-3. Redirect URI: `http://localhost:3000` (for local) and your production URL
-4. Under **API permissions** → Add → APIs my organization uses → search **Dataverse** → select `user_impersonation` (Delegated) → Grant admin consent
+3. Redirect URI: `http://localhost:5173` (for local) and your production URL
+4. Under **API permissions** add delegated permissions:
+    - Microsoft Graph → `User.Read`
+    - Power Apps Service → `user_impersonation`
+    - Dynamics CRM → `user_impersonation`
+    Then grant admin consent (recommended).
 
 #### 2. Configure & run
 
@@ -61,13 +65,12 @@ cp webapp/.env.example webapp/.env
 # Edit webapp/.env:
 #   VITE_CLIENT_ID=<App Registration client ID>
 #   VITE_TENANT_ID=<your tenant ID>
-#   VITE_DATAVERSE_URL=https://yourorg.crm.dynamics.com
 
 # Run with Docker Compose (builds + starts)
 cd webapp
 docker compose up --build
 
-# Open http://localhost:3000
+# Open http://localhost:5173
 ```
 
 #### Local dev (no Docker)
@@ -76,7 +79,7 @@ docker compose up --build
 cd webapp
 npm install
 cp .env.example .env   # fill in values
-npm run dev            # http://localhost:3000
+npm run dev            # http://localhost:5173
 ```
 
 ---
@@ -136,4 +139,4 @@ For the Power App, the app also reads `systemusers` to map the host Entra user t
 | Theme colour              | `webapp/src/App.tsx` for web app, or `powerapp/src/App.css` for Code App |
 | Analytics date window     | `useAnalytics.ts` → change `MS_30D` constant                             |
 | Max transcripts per agent | `dataverseService.ts` → `$top=200` query param                           |
-| Additional agent columns  | Add to `$select` in `getAgents()` and to `CopilotAgent` interface        |
+| Additional agent columns  | Add to `$select` in `getAgentsForEnvironment()` and to `CopilotAgent` interface |
