@@ -74,6 +74,19 @@ Starts on `http://localhost:5173`
 - Check browser popup settings for `localhost:5173`
 - Allow popups for the consent flow to work
 
+**Power App publishes but shows no telemetry data?**
+
+- This usually means the Power App local config is missing required Dataverse `databaseReferences`
+- In `powerapp/`, run `npm run validate:power-config` and confirm the config passes before publishing
+- Verify `powerapp/power.config.json` includes bindings for `bot`, `conversationtranscript`, `systemuser`, and `organization`
+- Re-publish from `powerapp/` with `npm run code:push`
+- After publish, open the app in the target environment and confirm the dashboard shows agents and transcript counts instead of an empty state
+
+**Power App CLI resolves the wrong tenant during push?**
+
+- In `powerapp/`, run `npm run code:reset-auth` to clear the local file cache and print the platform-specific next step
+- If `power-apps init` reports that the environment does not exist, skip init and use `powerapp/power.config.example.json` as the source for your local `power.config.json`
+
 ## Features
 
 - **Multi-environment:** Automatically discovers and displays agents from all environments you have access to

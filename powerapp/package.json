@@ -9,8 +9,11 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "code:bootstrap": "node ./scripts/bootstrapPowerConfig.mjs",
     "validate:power-config": "node ./scripts/validatePowerConfig.mjs",
+    "code:list": "power-apps list-codeapps",
     "code:init": "power-apps init",
+    "code:reset-auth": "node ./scripts/resetPowerAppsAuthCache.mjs",
     "code:push": "npm run validate:power-config && power-apps push"
   },
   "engines": {
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@microsoft/power-apps-cli": "0.9.1",
     "@microsoft/power-apps-vite": "^1.0.2",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

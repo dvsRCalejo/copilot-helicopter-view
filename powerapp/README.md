@@ -23,7 +23,21 @@ npm install
 
 Node.js 22 LTS is the recommended runtime for the Power Apps CLI used in this project.
 
-2. Create your local Power Apps config from the checked-in example:
+2. Create your local Power Apps config with the repo bootstrap command:
+
+```powershell
+npm run code:bootstrap
+```
+
+You can also pass values non-interactively:
+
+```powershell
+npm run code:bootstrap -- --environment-id <ENVIRONMENT_ID> --region prod --display-name "Copilot Helicopter View"
+```
+
+This creates `power.config.json` from the checked-in example and fills the local environment-specific values.
+
+If you prefer to do it by hand, copy the example manually:
 
 ```powershell
 Copy-Item power.config.example.json power.config.json
@@ -46,6 +60,12 @@ You can verify the local config before pushing:
 
 ```powershell
 npm run validate:power-config
+```
+
+If you need to confirm the signed-in account can see Code Apps in the target environment, you can list them with:
+
+```powershell
+npm run code:list
 ```
 
 3. (Optional) If you want to run CLI init, use:
@@ -89,8 +109,16 @@ The current npm Power Apps CLI is still rough around environment initialization 
 
 - Prefer the checked-in `power.config.example.json` over relying on `power-apps init`.
 - If `power-apps init` reports that your environment does not exist, continue with manual config instead of blocking on init.
-- If `power-apps push` resolves the wrong tenant, clear the CLI auth cache for your platform and retry with a fresh login.
+- If `power-apps push` resolves the wrong tenant, run `npm run code:reset-auth`, then clear the secure-store entry named `power-apps` for your platform if silent sign-in still persists.
 - Harmless telemetry initialization errors from the CLI can be ignored if the push itself succeeds.
+
+The CLI stores its file cache under `~/.powerapps-cli/cache/auth/msal_cache.json`.
+
+Platform-specific follow-up commands if a cached login keeps selecting the wrong tenant:
+
+- macOS: `security delete-generic-password -s "power-apps" -a "power-apps" 2>/dev/null`
+- Linux: `secret-tool clear service power-apps account power-apps`
+- Windows: remove any `power-apps` entry from Windows Credential Manager if one is present
 
 If you ever need to recreate the Dataverse bindings manually, add these data sources again:
 
@@ -105,7 +133,10 @@ pac code add-data-source -a dataverse -t organization
 
 - `npm run dev` - Start local dev server.
 - `npm run build` - Type-check and build production assets.
+- `npm run code:bootstrap` - Create or update `power.config.json` from the repo template.
+- `npm run code:list` - List Code Apps visible to the signed-in account.
 - `npm run code:init` - Shortcut for `power-apps init`.
+- `npm run code:reset-auth` - Clear the local Power Apps CLI auth cache and print platform-specific next steps.
 - `npm run code:push` - Shortcut for `power-apps push`.
 
 ## Next Build Goals

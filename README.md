@@ -71,13 +71,15 @@ Selecting a transcript opens the conversation in a chat-style modal, preserving 
 ```powershell
 # Create local Power Apps config from template (first run)
 cd powerapp
-Copy-Item power.config.example.json power.config.json
+npm run code:bootstrap
 
-# Edit power.config.json with your own environmentId/region
 # Keep databaseReferences unchanged (required for Dataverse data binding)
 
 # Optional: verify config before publish
 npm run validate:power-config
+
+# Optional: verify the signed-in account can see Code Apps
+npm run code:list
 
 # Optional: initialize app metadata via CLI
 npx power-apps init --display-name "Copilot Helicopter View" --environment-id <ENVIRONMENT_ID>
