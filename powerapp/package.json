@@ -9,8 +9,12 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "validate:power-config": "node ./scripts/validatePowerConfig.mjs",
     "code:init": "power-apps init",
-    "code:push": "power-apps push"
+    "code:push": "npm run validate:power-config && power-apps push"
+  },
+  "engines": {
+    "node": ">=22 <23"
   },
   "dependencies": {
     "@microsoft/power-apps": "^1.0.17",

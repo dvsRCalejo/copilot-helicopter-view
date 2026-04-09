@@ -1,9 +1,9 @@
 {
-  "version": "1.0",
-  "appId": "3776a88a-6783-4611-ae97-b72b3913ceab",
+  "version": "1.1.1",
+  "appId": null,
   "appDisplayName": "Copilot Helicopter View CodeApp",
   "region": "prod",
-  "environmentId": "dd2f1319-46af-e4ee-974e-73d0bff77306",
+  "environmentId": "00000000-0000-0000-0000-000000000000",
   "description": " ",
   "buildPath": "./dist",
   "buildEntryPoint": "index.html",

@@ -4,13 +4,13 @@ Helicopter-view dashboard for all **Copilot Studio agents** in your Microsoft 36
 
 Two deliverables with aligned UX and shared data concepts:
 
-|                | Power App                                                   | Static Website                              |
-| -------------- | ----------------------------------------------------------- | ------------------------------------------- |
-| **Stack**      | Power Apps Code Apps (Vite + React + @microsoft/power-apps) | React 18 + TypeScript + Vite + Fluent UI v9 |
-| **Auth**       | Power Platform native (AAD)                                 | MSAL.js v3 (popup/redirect)                 |
-| **Data**       | Dataverse connector + `systemusers` lookup for owner label  | Dataverse Web API (delegated)               |
+|                       | Power App                                                       | Static Website                                             |
+| --------------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Stack**             | Power Apps Code Apps (Vite + React + @microsoft/power-apps)     | React 18 + TypeScript + Vite + Fluent UI v9                |
+| **Auth**              | Power Platform native (AAD)                                     | MSAL.js v3 (popup/redirect)                                |
+| **Data**              | Dataverse connector + `systemusers` lookup for owner label      | Dataverse Web API (delegated)                              |
 | **Environment scope** | Single environment (the app's bound Power Platform environment) | Multi-environment (aggregates all accessible environments) |
-| **Deployment** | `power-apps push` to Power Platform environment             | Docker container (nginx)                    |
+| **Deployment**        | `power-apps push` to Power Platform environment                 | Docker container (nginx)                                   |
 
 ---
 
@@ -69,8 +69,17 @@ Selecting a transcript opens the conversation in a chat-style modal, preserving 
 ### Option A — Power App
 
 ```powershell
-# Initialize Code Apps metadata (first run)
+# Create local Power Apps config from template (first run)
 cd powerapp
+Copy-Item power.config.example.json power.config.json
+
+# Edit power.config.json with your own environmentId/region
+# Keep databaseReferences unchanged (required for Dataverse data binding)
+
+# Optional: verify config before publish
+npm run validate:power-config
+
+# Optional: initialize app metadata via CLI
 npx power-apps init --display-name "Copilot Helicopter View" --environment-id <ENVIRONMENT_ID>
 
 # Run locally
@@ -78,7 +87,7 @@ npm run dev
 
 # Build and publish
 npm run build
-npx power-apps push
+npm run code:push
 ```
 
 See [powerapp/README.md](powerapp/README.md) for full instructions.
@@ -95,10 +104,10 @@ Note: this implementation is environment-scoped. It only shows agents in the env
 2. Name: `CopilotHelicopterView`
 3. Redirect URI: `http://localhost:5173` (for local) and your production URL
 4. Under **API permissions** add delegated permissions:
-    - Microsoft Graph → `User.Read`
-    - Power Apps Service → `user_impersonation`
-    - Dynamics CRM → `user_impersonation`
-    Then grant admin consent (recommended).
+   - Microsoft Graph → `User.Read`
+   - Power Apps Service → `user_impersonation`
+   - Dynamics CRM → `user_impersonation`
+     Then grant admin consent (recommended).
 
 #### 2. Configure & run
 
@@ -133,12 +142,12 @@ Note: this implementation is environment-agnostic. It discovers all environments
 
 Use this guide when deciding which implementation to use:
 
-| Scenario | Power App | Webapp |
-| -------- | --------- | ------ |
-| Need visibility across all environments in a tenant | Not suitable (single environment) | Recommended |
-| Need a solution fully hosted inside Power Platform environment lifecycle | Recommended | Not primary goal |
-| Need central operations dashboard for owners/co-owners across environments | Limited | Recommended |
-| Environment-to-environment rollout isolation | Strong (each app instance is environment-bound) | Centralized view by design |
+| Scenario                                                                   | Power App                                       | Webapp                     |
+| -------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------- |
+| Need visibility across all environments in a tenant                        | Not suitable (single environment)               | Recommended                |
+| Need a solution fully hosted inside Power Platform environment lifecycle   | Recommended                                     | Not primary goal           |
+| Need central operations dashboard for owners/co-owners across environments | Limited                                         | Recommended                |
+| Environment-to-environment rollout isolation                               | Strong (each app instance is environment-bound) | Centralized view by design |
 
 Why both exist:
 
@@ -156,7 +165,8 @@ MyCopilotHelicopterView/
 ├── powerapp/
 │   ├── README.md                  # Code Apps setup guide
 │   ├── package.json               # npm scripts + @microsoft/power-apps
-│   ├── power.config.json          # generated after power-apps init
+│   ├── power.config.example.json  # template for local tenant/environment config
+│   ├── power.config.json          # local file (gitignored)
 │   └── src/
 │       └── App.tsx                # Code-first app shell and feature entry point
 └── webapp/
@@ -198,9 +208,9 @@ For the Power App, the app also reads `systemusers` to map the host Entra user t
 
 ## Customisation
 
-| What                      | Where                                                                    |
-| ------------------------- | ------------------------------------------------------------------------ |
-| Theme colour              | `webapp/src/App.tsx` for web app, or `powerapp/src/App.css` for Code App |
-| Analytics date window     | `useAnalytics.ts` → change `MS_30D` constant                             |
-| Max transcripts per agent | `dataverseService.ts` → `$top=200` query param                           |
+| What                      | Where                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| Theme colour              | `webapp/src/App.tsx` for web app, or `powerapp/src/App.css` for Code App        |
+| Analytics date window     | `useAnalytics.ts` → change `MS_30D` constant                                    |
+| Max transcripts per agent | `dataverseService.ts` → `$top=200` query param                                  |
 | Additional agent columns  | Add to `$select` in `getAgentsForEnvironment()` and to `CopilotAgent` interface |

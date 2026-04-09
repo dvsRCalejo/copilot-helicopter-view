@@ -29,9 +29,11 @@ npm-debug.log*
 # Temp / verify
 .tmp/
 .vite/
+FINDING.md
 
 # Power Platform local cache
 powerapp/.power/cache/
+powerapp/power.config.json
 
 # Solution build outputs
 solution/bin/
