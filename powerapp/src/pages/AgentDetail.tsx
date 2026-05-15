@@ -65,6 +65,13 @@ export function AgentDetail() {
       <button className="btn btn--ghost" onClick={() => navigate('/')}>
         ← All agents
       </button>
+      <button
+        className="btn btn--ghost btn--sm"
+        style={{ marginLeft: 8 }}
+        onClick={() => navigate(`/estimator?botId=${encodeURIComponent(agent.botid)}`)}
+      >
+        💸 Estimate cost
+      </button>
 
       <section className="surface-panel surface-panel--detail-hero">
         <div className="agent-detail__header">

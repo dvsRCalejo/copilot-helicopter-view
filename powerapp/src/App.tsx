@@ -7,6 +7,9 @@ import './App.css';
 const AgentDetail = lazy(() =>
   import('@/pages/AgentDetail').then((m) => ({ default: m.AgentDetail }))
 );
+const Estimator = lazy(() =>
+  import('@/pages/Estimator').then((m) => ({ default: m.Estimator }))
+);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -42,6 +45,21 @@ export default function App() {
                     }
                   >
                     <AgentDetail />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/estimator"
+                element={
+                  <Suspense
+                    fallback={
+                      <div className="spinner-container">
+                        <span className="spinner" />
+                        Loading…
+                      </div>
+                    }
+                  >
+                    <Estimator />
                   </Suspense>
                 }
               />

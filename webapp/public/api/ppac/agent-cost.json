@@ -1,0 +1,19 @@
+{
+  "agentId": "demo-agent-001",
+  "agentName": "Contoso Field Assistant",
+  "billingMode": "paygo",
+  "currency": "USD",
+  "period": "monthly",
+  "estimatedMonthlyCost": 142.5,
+  "costBreakdown": {
+    "basePlatform": 25,
+    "copilotRequests": 92.5,
+    "premiumConnectors": 15,
+    "storage": 10
+  },
+  "notes": [
+    "Mock response for dev prototype.",
+    "Set VITE_PPAC_AGENT_COST_URL to point to a real API endpoint."
+  ],
+  "source": "mock"
+}

@@ -95,6 +95,16 @@ export function AgentCard({ agent, showEnvironment = false, channels }: AgentCar
         >
           View details →
         </button>
+        <button
+          className="btn btn--ghost btn--sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/estimator?botId=${encodeURIComponent(agent.botid)}`);
+          }}
+          title="Estimate Copilot credits for this agent"
+        >
+          💸 Estimate
+        </button>
       </div>
     </div>
   );

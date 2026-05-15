@@ -1,0 +1,82 @@
+{
+  "$comment": "Default Copilot Studio credit rates. 1 credit = $0.01 USD. These are placeholder defaults aligned with the public Copilot Studio Estimator (https://microsoft.github.io/copilot-studio-estimator/). Tweak these values to match the latest official rates for your scenario — both the webapp and the Power App read from this file, and the values must stay in sync.",
+  "creditUnitUsd": 0.01,
+  "agentTypes": [
+    {
+      "id": "standard",
+      "label": "Standard Copilot Studio agent",
+      "description": "Custom-built agent authored in Copilot Studio (Generative or Classic runtime). Pay-per-message consumption."
+    },
+    {
+      "id": "autonomous",
+      "label": "Autonomous agent",
+      "description": "Trigger-based agent that runs independently to perform tasks. Each autonomous task consumes a flat credit amount."
+    }
+  ],
+  "features": [
+    {
+      "id": "classicAnswer",
+      "label": "Classic answer / scripted topic",
+      "credits": 1,
+      "defaultPerSession": 2,
+      "appliesTo": ["standard"],
+      "description": "Authored topic, simple Q&A or dialog turn without generative AI."
+    },
+    {
+      "id": "generativeAnswer",
+      "label": "Generative answer (public / web sources)",
+      "credits": 2,
+      "defaultPerSession": 1,
+      "appliesTo": ["standard"],
+      "description": "AI-generated answer grounded on public web content or non-enterprise knowledge."
+    },
+    {
+      "id": "generativeAnswerEnterprise",
+      "label": "Generative answer (enterprise data: Dataverse / SharePoint / Files)",
+      "credits": 10,
+      "defaultPerSession": 0,
+      "appliesTo": ["standard"],
+      "description": "AI-generated answer grounded on tenant-private knowledge sources."
+    },
+    {
+      "id": "tenantGraphGrounding",
+      "label": "Tenant graph grounding (Microsoft Graph)",
+      "credits": 30,
+      "defaultPerSession": 0,
+      "appliesTo": ["standard"],
+      "description": "Answer grounded with Microsoft Graph data (people, calendar, email)."
+    },
+    {
+      "id": "action",
+      "label": "Action / connector / Power Automate flow",
+      "credits": 5,
+      "defaultPerSession": 0,
+      "appliesTo": ["standard"],
+      "description": "Each action invocation (Power Automate flow, custom connector, Dataverse op)."
+    },
+    {
+      "id": "aiBuilderPrompt",
+      "label": "AI Builder prompt",
+      "credits": 1,
+      "defaultPerSession": 0,
+      "appliesTo": ["standard"],
+      "description": "AI Builder prompt invocation."
+    },
+    {
+      "id": "autonomousTask",
+      "label": "Autonomous task execution",
+      "credits": 25,
+      "defaultPerSession": 1,
+      "appliesTo": ["autonomous"],
+      "description": "Flat credit consumption per autonomous task / trigger run."
+    },
+    {
+      "id": "autonomousAction",
+      "label": "Action invoked inside autonomous run",
+      "credits": 5,
+      "defaultPerSession": 0,
+      "appliesTo": ["autonomous"],
+      "description": "Each downstream action triggered during an autonomous task."
+    }
+  ]
+}

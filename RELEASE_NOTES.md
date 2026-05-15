@@ -1,5 +1,31 @@
 # Release Notes
 
+## 2026-05-15
+
+### Copilot Credit Estimator
+
+- Added interactive cost forecasting tool for monthly Copilot credit consumption estimation
+- Feature-by-feature cost breakdown: classic answers, generative answers, enterprise data grounding, actions, AI Builder prompts, autonomous tasks, and more
+- Automatic baseline inference from agent transcripts: sessions/month, message depth, and feature usage patterns extracted from conversation data
+- Per-session adjustment controls: users can override any parameter to explore cost sensitivities and scenarios
+- Agent type selection: Standard Copilot Studio vs. Enterprise variants with different credit rate profiles
+- Per-feature transparency: each row shows credits per unit, auto-detected session counts, and per-session cost
+- Integration with agent grid: "💸 Estimate cost" button on each agent card and detail page
+- Disclaimer and validation reminders: feature detection is heuristic-based; costs should be validated against official Microsoft pricing before business decisions
+- Parity across both implementations: estimator available in both Power App Code App and static webapp
+- Pure utility library for cost calculations: `costEstimator.ts` with shared logic, test coverage, and centralized credit rate config
+
+### Implementation details
+
+- New pages: `webapp/src/pages/Estimator.tsx` and `powerapp/src/pages/Estimator.tsx`
+- Utility functions: `costEstimator.ts` with transcript inference, feature detection, and cost computation
+- Config: `src/data/copilotCreditRates.json` with 8 feature types, credit values, and billing rules
+- Tests: `costEstimator.test.ts` with coverage for inference and calculation logic
+- UI components: hero section, left-panel inputs (agent selector, sessions, feature toggles), right-panel breakdown with live cost totals
+- Both apps build successfully with zero TypeScript errors
+
+---
+
 ## 2026-04-09
 
 ### Power App Dataverse binding fix

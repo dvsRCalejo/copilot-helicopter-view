@@ -6,6 +6,7 @@ import { useMsal } from '@azure/msal-react';
 import { Dashboard } from '@/pages/Dashboard';
 
 const AgentDetail = lazy(() => import('@/pages/AgentDetail').then((m) => ({ default: m.AgentDetail })));
+const Estimator = lazy(() => import('@/pages/Estimator').then((m) => ({ default: m.Estimator })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,23 @@ const useStyles = makeStyles({
     fontSize: '18px',
     lineHeight: 1.2,
   },
+  topBarNav: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: tokens.spacingHorizontalS,
+  },
+  topBarLink: {
+    color: '#dcefff',
+    textDecoration: 'none',
+    border: '1px solid rgba(255,255,255,0.16)',
+    background: 'rgba(255,255,255,0.04)',
+    borderRadius: '999px',
+    fontSize: '12px',
+    fontWeight: 600,
+    padding: '6px 10px',
+    lineHeight: 1,
+    whiteSpace: 'nowrap',
+  },
   main: {
     flex: 1,
     minHeight: 0,
@@ -105,14 +123,16 @@ function TopBar() {
             <span className={styles.topBarTitle}>Copilot Helicopter View</span>
           </div>
         </div>
-        <Button
-          appearance="subtle"
-          className={styles.signOutButton}
-          onClick={() => instance.logoutRedirect()}
-          size="small"
-        >
-          Sign out {name ? `(${name})` : ''}
-        </Button>
+        <div className={styles.topBarNav}>
+          <Button
+            appearance="subtle"
+            className={styles.signOutButton}
+            onClick={() => instance.logoutRedirect()}
+            size="small"
+          >
+            Sign out {name ? `(${name})` : ''}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -134,6 +154,14 @@ export function App() {
                 element={
                   <Suspense fallback={<Spinner label="Loading page..." />}>
                     <AgentDetail />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/estimator"
+                element={
+                  <Suspense fallback={<Spinner label="Loading page..." />}>
+                    <Estimator />
                   </Suspense>
                 }
               />

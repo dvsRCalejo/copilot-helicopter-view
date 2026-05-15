@@ -156,6 +156,12 @@ export function AgentDetail() {
         >
           ← All agents
         </Button>
+        <Button
+          appearance="secondary"
+          onClick={() => navigate(`/estimator?botId=${encodeURIComponent(botId ?? '')}`)}
+        >
+          💸 Estimate cost
+        </Button>
       </div>
 
       {/* Agent heading */}

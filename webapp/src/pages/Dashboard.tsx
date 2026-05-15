@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   makeStyles,
   tokens,
@@ -205,6 +206,7 @@ const useStyles = makeStyles({
 
 export function Dashboard() {
   const styles = useStyles();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterMode>('all');
   const [search, setSearch] = useState('');
   const [environmentId, setEnvironmentId] = useState<string | null>(null);
@@ -298,7 +300,10 @@ export function Dashboard() {
                 value={search}
                 onChange={(_, d) => setSearch(d.value)}
               />
-              <div className={styles.toolbar}>
+              <div className={styles.toolbar} style={{ gap: 8 }}>
+                <Button appearance="primary" onClick={() => navigate('/estimator')}>
+                  💸 Cost estimator
+                </Button>
                 <Button appearance="secondary" onClick={() => refetch()} disabled={isLoading}>
                   Reload
                 </Button>

@@ -20,6 +20,7 @@ Two deliverables with aligned UX and shared data concepts:
 - **Filter** — All · Owned by me · Shared with me · Active only
 - **Agent detail** — analytics panel (total, last 7 / 30 days, sessions-per-day bar chart) + transcript list
 - **Transcript viewer** — inline chat-bubble rendering of Bot Framework Activity JSON
+- **Estimate costs** — monthly Copilot credit forecaster with per-feature usage breakdown and per-session adjustments; defaults inferred from agent transcripts
 - **Security** — Dataverse row-level security is the authoritative boundary; the UI never leaks agents the user can't access
 
 ---
@@ -61,6 +62,18 @@ The transcripts tab provides a searchable, filterable session index with date fi
 ![Transcript conversation drill-down](screenshots/helicopter-view-6.png)
 
 Selecting a transcript opens the conversation in a chat-style modal, preserving turn order and speaker context. This lets owners move from aggregate telemetry to the actual conversation content that explains why a metric moved.
+
+### 7. Copilot Credit Estimator — baseline and agent selection
+
+![Copilot Credit Estimator — baseline](screenshots/helicopter-view-7.png)
+
+The cost estimator forecasts monthly Copilot credit consumption for a Copilot Studio agent. It shows an editable baseline inferred from agent transcripts (sessions/month, message depth, feature usage), selectable agent type (Standard vs. Enterprise), and defaults to the actual agent's transcript patterns. Users can override any input or reset to defaults to explore cost sensitivities.
+
+### 8. Copilot Credit Estimator — per-feature breakdown
+
+![Copilot Credit Estimator — breakdown](screenshots/helicopter-view-8.png)
+
+The breakdown panel shows estimated monthly costs broken down by feature: classic answers, generative answers, enterprise data grounding, actions, AI Builder prompts, autonomous tasks, and more. Each row shows credits per unit, auto-detected sessions, and per-session cost. A disclaimer reminds users that feature detection is heuristic-based and costs should be validated against official Microsoft pricing before business decisions.
 
 ---
 

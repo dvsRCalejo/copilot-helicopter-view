@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AgentGrid } from '@/components/AgentGrid';
 import { useAgents } from '@/hooks/useAgents';
 import { useEnvironments } from '@/hooks/useEnvironments';
@@ -7,6 +8,7 @@ import type { FilterMode } from '@/types';
 import { searchAndSortAgents } from '@/utils/agentList';
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterMode>('all');
   const [search, setSearch] = useState('');
   const [environmentId, setEnvironmentId] = useState<string | null>(null);
@@ -92,6 +94,12 @@ export function Dashboard() {
                 onChange={(e) => setSearch(e.target.value)}
               />
               <div className="page__toolbar-row">
+                <button
+                  className="btn btn--primary btn--sm"
+                  onClick={() => navigate('/estimator')}
+                >
+                  💸 Cost estimator
+                </button>
                 <button
                   className="btn btn--ghost btn--sm btn--on-dark"
                   onClick={() => void refetch()}
